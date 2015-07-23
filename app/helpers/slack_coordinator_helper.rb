@@ -1,0 +1,2 @@
+module SlackCoordinatorHelper
+end
