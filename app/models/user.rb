@@ -6,4 +6,12 @@ class User < ActiveRecord::Base
   def to_s
     slack_user_name
   end
+
+  def games_finished
+    results.filter { |result| result.game.finished? }.size
+  end
+
+  def games_won
+    results.filter { |result| result.win? }.size
+  end
 end
