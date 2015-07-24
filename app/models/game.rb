@@ -30,6 +30,10 @@ class Game < ActiveRecord::Base
     PLAYERS_NEEDED_TO_WIN - number_of_winners
   end
 
+  def all_players_quit?
+    results.size == 0
+  end
+
   private
 
   def number_of_winners

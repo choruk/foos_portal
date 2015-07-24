@@ -55,10 +55,12 @@ class SlackCoordinatorController < ApplicationController
         if game
           json_result[:text] = "#{@user} has quit the current game. Need #{game.players_needed_to_start} more #{pluralize_players(game.players_needed_to_start)} to start."
         else
-          json_result[:text] = 'There is no game to quit. Type .foos to start a new one.'
+          json_result[:text] = 'All players have quit the game. Type .foos to start a new one.'
         end
       rescue GameQuittingService::UserNotInGameError
         json_result[:text] = "#{@user} is not currently in a game."
+      rescue GameQuittingService::GameNotFoundError
+        json_result[:text] = 'There is no game to quit. Type .foos to start a new one.'
       end
     when 'win'
       puts '***************REPORTING FINISHED GAME***************'
