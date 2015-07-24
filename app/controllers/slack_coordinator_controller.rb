@@ -20,16 +20,21 @@ class SlackCoordinatorController < ApplicationController
       end
     when 'in'
       puts '***************USER WANTS TO JOIN***************'
-      game = GameJoiningService.join(@user)
-      if game
-        if game.in_progress?
-          result[:text] = "#{@user} has joined the game.\nTTT"
+      begin
+        game = GameJoiningService.join(@user)
+        if game
+          if game.in_progress?
+            result[:text] = "#{@user} has joined the game.\nTTT"
+          else
+            result[:text] = "#{@user} has successfully joined the game. Need #{game.players_needed} more."
+          end
         else
-          result[:text] = "#{@user} has successfully joined the game. Need #{game.players_needed} more."
+          result[:text] = 'No game could be joined.'
         end
-      else
-        result[:text] = 'No game could be joined.'
+      rescue UserAlreadyJoinedError
+        result[:text] = "#{@user} has already joined the game being setup."
       end
+
     when 'abandon'
       puts '***************ABANDON IN PROGRESS GAME***************'
     when 'out'
@@ -41,7 +46,7 @@ class SlackCoordinatorController < ApplicationController
     when 'help'
       puts '***************PRINT HELP MESSAGE***************'
     else
-      puts '***************INVALID: PRINT HELP MESSAGE***************'
+      puts "***************INVALID (#{command_message}): PRINT HELP MESSAGE***************"
     end
 
     render json: result
@@ -58,6 +63,6 @@ class SlackCoordinatorController < ApplicationController
   end
 
   def command_message
-    params[:text].gsub(params[:trigger_word], '')
+    params[:text].gsub("#{params[:trigger_word]} ", '')
   end
 end
