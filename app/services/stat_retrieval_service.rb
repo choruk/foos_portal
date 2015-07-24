@@ -7,14 +7,14 @@ class StatRetrievalService
       losses: user.games_finished - user.games_won
     }
 
-    if user.results.size < User::GAMES_NEEDED_TO_RANK
+    unless user.ranked? < User::GAMES_NEEDED_TO_RANK
       user_stats[:unranked] = User::GAMES_NEEDED_TO_RANK - user.results.size
       return user_stats
     end
 
     sorted_win_ratios = [[win_ratio, user.slack_user_name]]
-    User.includes(:results).where('id != ?', user.id).each do |other_user|
-      next if other_user.results.size < User::GAMES_NEEDED_TO_RANK
+    User.where('id != ?', user.id).each do |other_user|
+      next unless other_user.ranked?
       user_win_ratio = other_user.games_won.to_f / other_user.games_finished.to_f
       sorted_win_ratios.push [user_win_ratio, other_user.slack_user_name]
     end
