@@ -14,13 +14,13 @@ class SlackCoordinatorController < ApplicationController
       puts '***************STARTING GAME***************'
       begin
         game = GameCreationService.create(@user)
-        json_result[:text] = "#{@user} is starting a new game. Need #{game.players_needed_to_start} more."
+        json_result[:text] = "#{@user} is starting a new game. Need #{game.players_needed_to_start} more #{pluralize_players(game.players_needed_to_start)} to start."
       rescue GameCreationService::GameInProgressError, GameCreationService::GameInSetupError => e
         game = e.game
         if game.in_progress?
           json_result[:text] = 'Game currently in progress.'
         else
-          json_result[:text] = "Need #{game.players_needed_to_start} more players. Type .in to join."
+          json_result[:text] = "Need #{game.players_needed_to_start} more #{pluralize_players(game.players_needed_to_start)} to start. Type .in to join."
         end
       end
     when 'in'
@@ -31,7 +31,7 @@ class SlackCoordinatorController < ApplicationController
           if game.in_progress?
             json_result[:text] = "#{@user} has joined the game.\nTTT"
           else
-            json_result[:text] = "#{@user} has successfully joined the game. Need #{game.players_needed_to_start} more."
+            json_result[:text] = "#{@user} has successfully joined the game. Need #{game.players_needed_to_start} more #{pluralize_players(game.players_needed_to_start)} to start."
           end
         else
           json_result[:text] = 'No game could be joined.'
@@ -50,6 +50,16 @@ class SlackCoordinatorController < ApplicationController
       end
     when 'out'
       puts '***************USER WANTS TO LEAVE***************'
+      begin
+        game = GameQuittingService.quit(@user)
+        if game
+          json_result[:text] = "#{@user} has quit the current game. Need #{game.players_needed_to_start} more #{pluralize_players(game.players_needed_to_start)} to start."
+        else
+          json_result[:text] = 'There is no game to quit. Type .foos to start a new one.'
+        end
+      rescue GameQuittingService::UserNotInGameError
+        json_result[:text] = "#{@user} is not currently in a game."
+      end
     when 'win'
       puts '***************REPORTING FINISHED GAME***************'
       begin
@@ -58,7 +68,7 @@ class SlackCoordinatorController < ApplicationController
         if game.finished?
           json_result[:text] = "Recorded win for #{@user}. All wins reported."
         else
-          json_result[:text] = "Recorded win for #{@user}. Need #{game.players_needed_to_finish} more #{'player'.pluralize(game.players_needed_to_finish)} to report a win."
+          json_result[:text] = "Recorded win for #{@user}. Need #{game.players_needed_to_finish} more #{pluralize_players(game.players_needed_to_finish)} to report a win."
         end
       rescue ResultCreationService::NoGameInProgressError
         json_result[:text] = 'Cannot record win because there is no game in progress.'
@@ -92,5 +102,9 @@ class SlackCoordinatorController < ApplicationController
 
   def command
     params[:trigger_word].sub('.', '')
+  end
+
+  def pluralize_players(count)
+    'player'.pluralize(count)
   end
 end
