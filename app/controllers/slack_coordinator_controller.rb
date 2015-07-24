@@ -16,7 +16,11 @@ class SlackCoordinatorController < ApplicationController
       if game
         result[:text] = "#{@user} is starting a new game. Need 3 more."
       else
-        result[:text] = 'Game currently in progress.'
+        if game.in_progress?
+          result[:text] = 'Game currently in progress.'
+        else
+          result[:text] = "Need #{game.players_needed} more players. Type .in to join."
+        end
       end
     when 'in'
       puts '***************USER WANTS TO JOIN***************'
