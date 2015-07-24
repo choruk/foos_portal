@@ -8,7 +8,7 @@ class StatRetrievalService
     }
 
     unless user.ranked?
-      user_stats[:unranked] = User::GAMES_NEEDED_TO_RANK - user.results.size
+      user_stats[:unranked] = User::GAMES_NEEDED_TO_RANK - user.games_finished
       return user_stats
     end
 
