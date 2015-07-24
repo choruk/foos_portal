@@ -1,4 +1,13 @@
 class SlackCoordinatorController < ApplicationController
+  ALL_COMMANDS = {
+    '.foos' => 'Start a new game',
+    '.in' => 'Join the current game',
+    '.out' => 'Leave the current game',
+    '.quit' => 'Abandon the current game',
+    '.win' => 'Record a win for the current game',
+    '.stats' => 'View personal stats'
+  }.freeze
+
   skip_before_action :verify_authenticity_token, only: :receive
 
   before_filter :find_user
@@ -90,6 +99,10 @@ class SlackCoordinatorController < ApplicationController
       json_result[:text] += "Wins: #{user_stats[:wins]}\tLosses: #{user_stats[:losses]}\n#{@user} has won #{user_stats[:win_ratio]*100}% of the games they have finished."
     when 'help'
       puts '***************PRINT HELP MESSAGE***************'
+      json_result[:text] = ''
+      ALL_COMMANDS.each do |command, description|
+        json_result[:text] += "_#{command}_ : #{description}"
+      end
     else
       puts "***************INVALID (#{command_message}): PRINT HELP MESSAGE***************"
     end
