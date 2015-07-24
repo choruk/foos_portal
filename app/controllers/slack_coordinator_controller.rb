@@ -5,7 +5,8 @@ class SlackCoordinatorController < ApplicationController
     '.out' => 'Leave the current game',
     '.quit' => 'Abandon the current game',
     '.win' => 'Record a win for the current game',
-    '.stats' => 'View personal stats'
+    '.stats' => 'View personal stats',
+    '.rankings' => 'View leaderboard'
   }.freeze
 
   skip_before_action :verify_authenticity_token, only: :receive

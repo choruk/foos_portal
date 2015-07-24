@@ -1,5 +1,5 @@
 class Game < ActiveRecord::Base
-  PLAYERS_NEEDED_TO_PLAY = 3
+  PLAYERS_NEEDED_TO_PLAY = 4
   PLAYERS_NEEDED_TO_WIN = 2
 
   has_many :results, dependent: :destroy
