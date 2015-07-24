@@ -7,7 +7,7 @@ class GameJoiningService
     if game_being_setup
       #add user to game, but first check if they are already in it
       user_ids = game_being_setup.results.map(&:user_id)
-      raise UserAlreadyJoinedError, "#{user.user_name} has already joined the current game being setup." if user_ids.include?(user.id)
+      raise UserAlreadyJoinedError, "#{user} has already joined the current game being setup." if user_ids.include?(user.id)
 
       new_result = user.results.build
       new_result.game = game_being_setup
