@@ -34,6 +34,10 @@ class Game < ActiveRecord::Base
     results.size == 0
   end
 
+  def win_recorded?
+    number_of_winners > 0
+  end
+
   private
 
   def number_of_winners

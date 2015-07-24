@@ -5,6 +5,9 @@ class GameQuittingService
   class GameNotFoundError < StandardError
   end
 
+  class WinResultFoundError < StandardError
+  end
+
   def self.quit(user)
     find_result = lambda do |game|
       result = game.results.find { |result| result.user_id == user.id }
@@ -15,6 +18,7 @@ class GameQuittingService
     game_in_progress = Game.in_progress.includes(:results).first
     game_being_setup = Game.in_setup.includes(:results).first
     if game_in_progress
+      raise WinResultFoundError if game_in_progress.win_recorded?
       result = find_result.call(game_in_progress)
       result.destroy
       game_in_progress.update_attributes!(started_at: nil)

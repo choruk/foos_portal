@@ -20,7 +20,7 @@ class SlackCoordinatorController < ApplicationController
         if game.in_progress?
           json_result[:text] = 'Game currently in progress.'
         else
-          json_result[:text] = "Need #{game.players_needed_to_start} more #{pluralize_players(game.players_needed_to_start)} to start. Type .in to join."
+          json_result[:text] = "Need #{game.players_needed_to_start} more #{pluralize_players(game.players_needed_to_start)} to start. Type _.in_ to join."
         end
       end
     when 'in'
@@ -44,9 +44,9 @@ class SlackCoordinatorController < ApplicationController
       puts '***************ABANDON IN PROGRESS GAME***************'
       success = GameAbandoningService.abandon
       if success
-        json_result[:text] = 'Game has been abandoned. Type .foos to start a new one.'
+        json_result[:text] = 'Game has been abandoned. Type _.foos_ to start a new one.'
       else
-        json_result[:text] = 'There is no game to abandon. Type .foos to start a new one.'
+        json_result[:text] = 'There is no game to abandon. Type _.foos_ to start a new one.'
       end
     when 'out'
       puts '***************USER WANTS TO LEAVE***************'
@@ -55,12 +55,14 @@ class SlackCoordinatorController < ApplicationController
         if game
           json_result[:text] = "#{@user} has quit the current game. Need #{game.players_needed_to_start} more #{pluralize_players(game.players_needed_to_start)} to start."
         else
-          json_result[:text] = 'All players have quit the game. Type .foos to start a new one.'
+          json_result[:text] = 'All players have quit the game. Type _.foos_ to start a new one.'
         end
       rescue GameQuittingService::UserNotInGameError
         json_result[:text] = "#{@user} is not currently in a game."
       rescue GameQuittingService::GameNotFoundError
-        json_result[:text] = 'There is no game to quit. Type .foos to start a new one.'
+        json_result[:text] = 'There is no game to quit. Type _.foos_ to start a new one.'
+      rescue GameQuittingService::WinResultFoundError
+        json_result[:text] = 'There is already one win recorded. Type _.quit_ to abandon the game. Note: this will cause the current win to be lost.'
       end
     when 'win'
       puts '***************REPORTING FINISHED GAME***************'
