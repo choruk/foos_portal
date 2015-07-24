@@ -12,10 +12,11 @@ class SlackCoordinatorController < ApplicationController
     case command
     when 'foos'
       puts '***************STARTING GAME***************'
-      game = GameCreationService.create(@user)
-      if game
+      begin
+        game = GameCreationService.create(@user)
         result[:text] = "#{@user} is starting a new game. Need 3 more."
-      else
+      rescue GameCreationService::GameInProgressError, GameCreationService::GameInSetupError => e
+        game = e.game
         if game.in_progress?
           result[:text] = 'Game currently in progress.'
         else
