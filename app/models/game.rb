@@ -2,7 +2,7 @@ class Game < ActiveRecord::Base
   PLAYERS_NEEDED_TO_PLAY = 3
   PLAYERS_NEEDED_TO_WIN = 2
 
-  has_many :results
+  has_many :results, dependent: :destroy
 
   scope :in_progress, -> { where('finished_at IS NULL AND abandoned = false AND started_at IS NOT NULL') }
   scope :in_setup, -> { where(started_at: nil, abandoned: false) }

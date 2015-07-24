@@ -42,6 +42,12 @@ class SlackCoordinatorController < ApplicationController
 
     when 'quit'
       puts '***************ABANDON IN PROGRESS GAME***************'
+      success = GameAbandoningService.abandon
+      if success
+        json_result[:text] = 'Game has been abandoned. Type .foos to start a new one.'
+      else
+        json_result[:text] = 'There is no game to abandon. Type .foos to start a new one.'
+      end
     when 'out'
       puts '***************USER WANTS TO LEAVE***************'
     when 'win'
