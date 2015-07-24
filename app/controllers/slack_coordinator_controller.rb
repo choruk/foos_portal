@@ -9,8 +9,8 @@ class SlackCoordinatorController < ApplicationController
     puts params
 
     result = { text: 'Yea I heard you' }
-    case command_message
-    when 'now'
+    case command
+    when 'foos'
       puts '***************STARTING GAME***************'
       game = GameCreationService.create(@user)
       if game
@@ -35,11 +35,11 @@ class SlackCoordinatorController < ApplicationController
         result[:text] = "#{@user} has already joined the game being setup."
       end
 
-    when 'abandon'
+    when 'quit'
       puts '***************ABANDON IN PROGRESS GAME***************'
     when 'out'
       puts '***************USER WANTS TO LEAVE***************'
-    when 'report'
+    when 'win'
       puts '***************REPORTING FINISHED GAME***************'
     when 'stats'
       puts '***************GET STATS FOR USER***************'
@@ -64,5 +64,9 @@ class SlackCoordinatorController < ApplicationController
 
   def command_message
     params[:text].gsub("#{params[:trigger_word]} ", '')
+  end
+
+  def command
+    params[:trigger_word].sub('.', '')
   end
 end
