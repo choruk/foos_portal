@@ -6,6 +6,12 @@ class Game < ActiveRecord::Base
 
   scope :in_progress, -> { where('finished_at IS NULL AND abandoned = false AND started_at IS NOT NULL') }
   scope :in_setup, -> { where(started_at: nil, abandoned: false) }
+  scope :finished, -> { where(finished_sql) }
+
+  def self.finished_sql(table_name = '')
+    table_name += '.' if table_name.present?
+    "#{table_name}finished_at IS NOT NULL AND #{table_name}abandoned = false"
+  end
 
   validates_inclusion_of :abandoned, in: [true, false]
   validates_presence_of :started_at, if: -> { finished_at.present? }

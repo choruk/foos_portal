@@ -8,10 +8,10 @@ class User < ActiveRecord::Base
   end
 
   def games_finished
-    results.filter { |result| result.game.finished? }.size
+    results.finished.size
   end
 
   def games_won
-    results.filter { |result| result.win? }.size
+    results.wins.size
   end
 end
