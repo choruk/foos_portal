@@ -1,5 +1,6 @@
 class Game < ActiveRecord::Base
-  PLAYERS_NEEDED = 3
+  PLAYERS_NEEDED_TO_PLAY = 3
+  PLAYERS_NEEDED_TO_WIN = 2
 
   has_many :results
 
@@ -17,7 +18,21 @@ class Game < ActiveRecord::Base
     started_at.nil? && !abandoned
   end
 
-  def players_needed
-    PLAYERS_NEEDED - results.map(&:user_id).length
+  def finished?
+    number_of_winners == PLAYERS_NEEDED_TO_WIN
+  end
+
+  def players_needed_to_start
+    PLAYERS_NEEDED_TO_PLAY - results.map(&:user_id).length
+  end
+
+  def players_needed_to_finish
+    PLAYERS_NEEDED_TO_WIN - number_of_winners
+  end
+
+  private
+
+  def number_of_winners
+    results.where(win: true).length
   end
 end

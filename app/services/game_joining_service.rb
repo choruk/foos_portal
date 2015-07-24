@@ -14,7 +14,7 @@ class GameJoiningService
       new_result.save!
       game_being_setup.reload
 
-      game_being_setup.update_attributes!(started_at: Time.zone.now) if game_being_setup.players_needed == 0
+      game_being_setup.update_attributes!(started_at: Time.zone.now) if game_being_setup.players_needed_to_start == 0
       game_being_setup
     else
       false

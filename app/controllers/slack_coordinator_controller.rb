@@ -8,19 +8,19 @@ class SlackCoordinatorController < ApplicationController
   def receive
     puts params
 
-    result = { text: 'Yea I heard you' }
+    json_result = { text: 'Yea I heard you' }
     case command
     when 'foos'
       puts '***************STARTING GAME***************'
       begin
         game = GameCreationService.create(@user)
-        result[:text] = "#{@user} is starting a new game. Need #{game.players_needed} more."
+        json_result[:text] = "#{@user} is starting a new game. Need #{game.players_needed_to_start} more."
       rescue GameCreationService::GameInProgressError, GameCreationService::GameInSetupError => e
         game = e.game
         if game.in_progress?
-          result[:text] = 'Game currently in progress.'
+          json_result[:text] = 'Game currently in progress.'
         else
-          result[:text] = "Need #{game.players_needed} more players. Type .in to join."
+          json_result[:text] = "Need #{game.players_needed_to_start} more players. Type .in to join."
         end
       end
     when 'in'
@@ -29,15 +29,15 @@ class SlackCoordinatorController < ApplicationController
         game = GameJoiningService.join(@user)
         if game
           if game.in_progress?
-            result[:text] = "#{@user} has joined the game.\nTTT"
+            json_result[:text] = "#{@user} has joined the game.\nTTT"
           else
-            result[:text] = "#{@user} has successfully joined the game. Need #{game.players_needed} more."
+            json_result[:text] = "#{@user} has successfully joined the game. Need #{game.players_needed_to_start} more."
           end
         else
-          result[:text] = 'No game could be joined.'
+          json_result[:text] = 'No game could be joined.'
         end
       rescue GameJoiningService::UserAlreadyJoinedError
-        result[:text] = "#{@user} has already joined the game being setup."
+        json_result[:text] = "#{@user} has already joined the game being setup."
       end
 
     when 'quit'
@@ -46,6 +46,17 @@ class SlackCoordinatorController < ApplicationController
       puts '***************USER WANTS TO LEAVE***************'
     when 'win'
       puts '***************REPORTING FINISHED GAME***************'
+      begin
+        result = ResultCreationService.create(@user)
+        game = result.game
+        if game.finished?
+          json_result[:text] = "Recorded win for #{@user}. All wins reported."
+        else
+          json_result[:text] = "Recorded win for #{@user}. Need #{game.players_needed_to_finish}"
+        end
+      rescue ResultCreationService::NoGameInProgressError
+        json_result[:text] = 'Cannot record win because there is no game in progress.'
+      end
     when 'stats'
       puts '***************GET STATS FOR USER***************'
     when 'help'
@@ -54,7 +65,7 @@ class SlackCoordinatorController < ApplicationController
       puts "***************INVALID (#{command_message}): PRINT HELP MESSAGE***************"
     end
 
-    render json: result
+    render json: json_result
   end
 
   private
