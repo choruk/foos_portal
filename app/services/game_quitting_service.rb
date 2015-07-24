@@ -28,8 +28,10 @@ class GameQuittingService
       result.destroy
       if game_being_setup.reload.all_players_quit?
         game_being_setup.destroy
+        false
+      else
+        game_being_setup
       end
-      return false
     else
       raise GameNotFoundError
     end
