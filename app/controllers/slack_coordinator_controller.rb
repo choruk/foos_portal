@@ -29,7 +29,7 @@ class SlackCoordinatorController < ApplicationController
         if game.in_progress?
           json_result[:text] = 'Game currently in progress.'
         else
-          json_result[:text] = "Need #{game.players_needed_to_start} more #{pluralize_players(game.players_needed_to_start)} to start. Type _.in_ to join."
+          json_result[:text] = "A game has already been started. Need #{game.players_needed_to_start} more #{pluralize_players(game.players_needed_to_start)} to start. Type _.in_ to join."
         end
       end
     when 'in'
@@ -97,11 +97,14 @@ class SlackCoordinatorController < ApplicationController
         json_result[:text] = "#{@user} needs to play #{user_stats[:unranked]} more #{'game'.pluralize(user_stats[:unranked])} to be ranked.\n"
       end
       json_result[:text] += "Wins: #{user_stats[:wins]}\tLosses: #{user_stats[:losses]}\n#{@user} has won #{user_stats[:win_ratio]*100}% of the games they have finished."
+    when 'rankings'
+      puts '***************GET GLOBAL RANKINGS***************'
+
     when 'help'
       puts '***************PRINT HELP MESSAGE***************'
       json_result[:text] = ''
       ALL_COMMANDS.each do |command, description|
-        json_result[:text] += "_#{command}_ : #{description}"
+        json_result[:text] += "_#{command}_\t\t#{description}\n"
       end
     else
       puts "***************INVALID (#{command_message}): PRINT HELP MESSAGE***************"
