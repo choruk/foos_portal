@@ -52,10 +52,12 @@ class SlackCoordinatorController < ApplicationController
         if game.finished?
           json_result[:text] = "Recorded win for #{@user}. All wins reported."
         else
-          json_result[:text] = "Recorded win for #{@user}. Need #{game.players_needed_to_finish}"
+          json_result[:text] = "Recorded win for #{@user}. Need #{game.players_needed_to_finish} more #{'player'.pluralize(game.players_needed_to_finish)} to report a win."
         end
       rescue ResultCreationService::NoGameInProgressError
         json_result[:text] = 'Cannot record win because there is no game in progress.'
+      rescue ResultCreationService::ResultAlreadyRecordedError
+        json_result[:text] = "#{@user} has already recorded a win for this game."
       end
     when 'stats'
       puts '***************GET STATS FOR USER***************'
