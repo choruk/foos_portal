@@ -82,7 +82,12 @@ class SlackCoordinatorController < ApplicationController
     when 'stats'
       puts '***************GET STATS FOR USER***************'
       user_stats = StatRetrievalService.find(@user)
-      json_result[:text] = "##{user_stats[:rank]}: #{@user} has won #{user_stats[:win_ratio]*100}% of games they have finished."
+      if user_stats[:rank]
+        json_result[:text] = "Rank: #{user_stats[:rank]}\n"
+      else
+        json_result[:text] = "#{@user} needs to play #{user_stats[:unranked]} more #{'game'.pluralize(user_stats[:unranked])} to be ranked.\n"
+      end
+      json_result[:text] += "Wins: #{user_stats[:wins]}\tLosses: #{user_stats[:losses]}\n#{@user} has won #{user_stats[:win_ratio]*100}% of the games they have finished."
     when 'help'
       puts '***************PRINT HELP MESSAGE***************'
     else
