@@ -12,8 +12,9 @@ class GameJoiningService
       new_result = user.results.build
       new_result.game = game_being_setup
       new_result.save!
+      game_being_setup.reload
 
-      game_being_setup.update_attributes!(started_at: Time.zone.now) if user_ids.length == Game::PLAYERS_NEEDED-1
+      game_being_setup.update_attributes!(started_at: Time.zone.now) if game_being_setup.players_needed == 0
       game_being_setup
     else
       false
