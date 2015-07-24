@@ -11,7 +11,7 @@ class StatRetrievalService
       sorted_win_ratios.push [user_win_ratio, other_user.id]
     end
     sorted_win_ratios.sort!
-    user_stats[:rank] = sorted_win_ratios.index+1
+    user_stats[:rank] = sorted_win_ratios.index([win_ratio, user.id])+1
 
     user_stats
   end
