@@ -14,7 +14,7 @@ class SlackCoordinatorController < ApplicationController
       puts '***************STARTING GAME***************'
       begin
         game = GameCreationService.create(@user)
-        result[:text] = "#{@user} is starting a new game. Need 3 more."
+        result[:text] = "#{@user} is starting a new game. Need #{game.players_needed} more."
       rescue GameCreationService::GameInProgressError, GameCreationService::GameInSetupError => e
         game = e.game
         if game.in_progress?

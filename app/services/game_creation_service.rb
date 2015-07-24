@@ -24,6 +24,6 @@ class GameCreationService
     new_result = user.results.build
     new_result.game = new_game
     new_result.save!
-    new_game
+    new_game.reload
   end
 end
