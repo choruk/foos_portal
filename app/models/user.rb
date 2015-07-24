@@ -17,6 +17,10 @@ class User < ActiveRecord::Base
     results.wins.size
   end
 
+  def games_lost
+    games_finished - games_won
+  end
+
   def ranked?
     games_finished >= GAMES_NEEDED_TO_RANK
   end

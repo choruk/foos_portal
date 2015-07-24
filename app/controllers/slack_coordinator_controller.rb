@@ -99,7 +99,12 @@ class SlackCoordinatorController < ApplicationController
       json_result[:text] += "Wins: #{user_stats[:wins]}\tLosses: #{user_stats[:losses]}\n#{@user} has won #{user_stats[:win_ratio]*100}% of the games they have finished."
     when 'rankings'
       puts '***************GET GLOBAL RANKINGS***************'
-
+      rankings = StatRetrievalService.rankings
+      json_result[:text] = ''
+      rankings.each_with_index do |ranking_hash, index|
+        rank = index + 1
+        json_result[:text] += "#{rank}\t#{ranking_hash[:slack_name]}\t#{ranking_hash[:wins]}-#{ranking_hash[:losses]}\n"
+      end
     when 'help'
       puts '***************PRINT HELP MESSAGE***************'
       json_result[:text] = ''
