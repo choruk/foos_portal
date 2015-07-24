@@ -31,7 +31,7 @@ class SlackCoordinatorController < ApplicationController
         else
           result[:text] = 'No game could be joined.'
         end
-      rescue UserAlreadyJoinedError
+      rescue GameJoiningService::UserAlreadyJoinedError
         result[:text] = "#{@user} has already joined the game being setup."
       end
 
