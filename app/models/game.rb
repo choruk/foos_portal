@@ -1,4 +1,6 @@
 class Game < ActiveRecord::Base
+  PLAYERS_NEEDED = 3
+
   has_many :results
 
   scope :in_progress, -> { where('finished_at IS NULL AND abandoned = false AND started_at IS NOT NULL') }
@@ -16,6 +18,6 @@ class Game < ActiveRecord::Base
   end
 
   def players_needed
-    4 - results.map(&:user_id).length
+    PLAYERS_NEEDED - results.map(&:user_id).length
   end
 end
