@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150724001958) do
+ActiveRecord::Schema.define(version: 20150724002847) do
 
   create_table "games", force: true do |t|
     t.datetime "finished_at"
@@ -19,6 +19,17 @@ ActiveRecord::Schema.define(version: 20150724001958) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "results", force: true do |t|
+    t.integer  "game_id",                    null: false
+    t.integer  "user_id",                    null: false
+    t.boolean  "win",        default: false, null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "results", ["game_id"], name: "fk_results_game_id_games", using: :btree
+  add_index "results", ["user_id"], name: "fk_results_user_id_users", using: :btree
 
   create_table "users", force: true do |t|
     t.string   "slack_user_id",   null: false
