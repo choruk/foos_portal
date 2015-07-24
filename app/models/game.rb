@@ -2,8 +2,5 @@ class Game < ActiveRecord::Base
   has_many :results
 
   validates_inclusion_of :abandoned, in: [true, false]
-
-  def started_at
-    created_at
-  end
+  validates_presence_of :started_at, if: -> { finished_at.present? }
 end
