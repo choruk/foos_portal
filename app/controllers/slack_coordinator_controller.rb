@@ -10,8 +10,11 @@ class SlackCoordinatorController < ApplicationController
     '.help' => 'View this help message'
   }.freeze
 
+  SLACK_TOKEN = ENV['SLACK_TOKEN']
+
   skip_before_action :verify_authenticity_token, only: :receive
 
+  before_filter :verify_slack_token
   before_filter :find_user
 
   def receive
@@ -126,6 +129,14 @@ class SlackCoordinatorController < ApplicationController
 
   def user_params
     params.permit(:user_id, :user_name)
+  end
+
+  def slack_token_param
+    params.require(:token)
+  end
+
+  def verify_slack_token
+    head :unauthorized unless slack_token_param == SLACK_TOKEN
   end
 
   def find_user
