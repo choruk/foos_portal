@@ -29,7 +29,7 @@ class SlackCoordinatorController < ApplicationController
       rescue GameCreationService::GameInProgressError, GameCreationService::GameInSetupError => e
         game = e.game
         if game.in_progress?
-          json_result[:text] = 'Game currently in progress.'
+          json_result[:text] = "Game currently in progress (#{list_players_in_game(game)})."
         else
           json_result[:text] = "A game has already been started. Need #{game.players_needed_to_start} more #{pluralize_players(game.players_needed_to_start)} to start. Type _.in_ to join."
         end
@@ -48,7 +48,7 @@ class SlackCoordinatorController < ApplicationController
           json_result[:text] = 'No game could be joined.'
         end
       rescue GameJoiningService::UserAlreadyJoinedError
-        json_result[:text] = "#{@user} has already joined the game being setup."
+        json_result[:text] = "#{@user} has already joined the game being set up."
       end
 
     when 'quit'
@@ -152,5 +152,9 @@ class SlackCoordinatorController < ApplicationController
 
   def pluralize_players(count)
     'player'.pluralize(count)
+  end
+
+  def list_players_in_game(game)
+    game.players.map(&:slack_user_name).join(', ')
   end
 end
