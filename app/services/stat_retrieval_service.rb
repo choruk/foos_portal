@@ -8,14 +8,7 @@ class StatRetrievalService
 
     return user_stats unless user.ranked?
 
-    user_win_ratio_tuple = [win_ratio, user.slack_user_name]
-    sorted_win_ratios = [user_win_ratio_tuple]
-    User.where('id != ?', user.id).each do |other_user|
-      next unless other_user.ranked?
-      sorted_win_ratios.push [other_user.win_ratio, other_user.slack_user_name]
-    end
-    sorted_win_ratios.sort! { |x,y| x.first <=> y.first && x.last <=> y.last }
-    user_stats[:rank] = sorted_win_ratios.index(user_win_ratio_tuple)+1
+    user_stats[:rank] = rankings.find { |user_stats| user_stats[:slack_name] == user.slack_user_name }[:rank]
     user_stats
   end
 
@@ -25,7 +18,26 @@ class StatRetrievalService
       next unless user.ranked?
       sorted_win_ratios.push({ win_ratio: user.win_ratio, slack_name: user.slack_user_name, wins: user.games_won, losses: user.games_lost })
     end
-    sorted_win_ratios.sort! { |x,y| x[:win_ratio] <=> y[:win_ratio] && x[:slack_name] <=> y[:slack_name] }
-    sorted_win_ratios
+    sorted_win_ratios.sort! { |x,y| y[:win_ratio] <=> x[:win_ratio] }
+    determine_ranks(sorted_win_ratios)
   end
+
+  ####PRIVATE METHODS####
+
+  def self.determine_ranks(sorted_user_win_ratios)
+    previous_win_ratio = -1
+    current_rank = 0
+    players_at_rank = 1
+    sorted_user_win_ratios.each do |user_win_ratio_hash|
+      if user_win_ratio_hash[:win_ratio] != previous_win_ratio
+        current_rank += players_at_rank
+        players_at_rank = 0
+        previous_win_ratio = user_win_ratio_hash[:win_ratio]
+      end
+
+      user_win_ratio_hash[:rank] = current_rank
+      players_at_rank += 1
+    end
+  end
+  private_class_method :determine_ranks
 end

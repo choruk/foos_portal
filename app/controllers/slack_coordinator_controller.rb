@@ -104,9 +104,8 @@ class SlackCoordinatorController < ApplicationController
       rankings = StatRetrievalService.rankings
       if rankings.present?
         json_result[:text] = ''
-        rankings.each_with_index do |ranking_hash, index|
-          rank = index + 1
-          json_result[:text] += "#{rank}\t#{ranking_hash[:slack_name]}\t#{ranking_hash[:wins]}-#{ranking_hash[:losses]}\n"
+        rankings.each do |ranking_hash|
+          json_result[:text] += "#{ranking_hash[:rank]}\t#{ranking_hash[:slack_name]}\t#{ranking_hash[:wins]}-#{ranking_hash[:losses]}\n"
         end
       else
         json_result[:text] = 'There are no ranked players yet.'
