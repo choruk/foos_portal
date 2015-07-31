@@ -3,6 +3,7 @@ class Game < ActiveRecord::Base
   PLAYERS_NEEDED_TO_WIN = 2
 
   has_many :results, dependent: :destroy
+  has_many :users, through: :results
 
   scope :in_progress, -> { where('finished_at IS NULL AND abandoned = false AND started_at IS NOT NULL') }
   scope :in_setup, -> { where(started_at: nil, abandoned: false) }
@@ -42,6 +43,14 @@ class Game < ActiveRecord::Base
 
   def win_recorded?
     number_of_winners > 0
+  end
+
+  def winning_team
+    results.select(&:win).map(&:user)
+  end
+
+  def losing_team
+    results.reject(&:win).map(&:user)
   end
 
   private

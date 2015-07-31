@@ -1,0 +1,5 @@
+<h2 class="header">Recent Games</h2>
+
+<% Game.order('id desc').limit(20).each do |game| %>
+  <%= render partial: 'game_row', locals: { game: game } %>
+<% end %>

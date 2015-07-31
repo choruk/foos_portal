@@ -1,0 +1,9 @@
+<div class="col s12 m5">
+  <div class="card <%= win ? 'green' : 'red' %> darken-1">
+    <div class="card-content white-text">
+      <span class="card-title"><%= win ? 'Winners' : 'Loosers' %></span>
+      <p><%= players.first.slack_user_name %></p>
+      <p><%= players.last.slack_user_name %></p>
+    </div>
+  </div>
+</div>
