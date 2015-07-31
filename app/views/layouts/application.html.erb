@@ -37,5 +37,13 @@
 <script>
   $(".button-collapse").sideNav();
 </script>
+
+<% if flash[:notice] %>
+  <script>
+    Materialize.toast('<span><%= flash[:notice] %></span>', 5000)
+  </script>
+<% end %>
+
+<%= yield :javascript %>
 </body>
 </html>
