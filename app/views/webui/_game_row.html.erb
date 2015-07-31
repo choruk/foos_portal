@@ -2,11 +2,11 @@
 <div class="row">
   <%= render partial: 'team_card', locals: { win: true, players: game.winning_team } %>
 
-  <div class="col s12 m1" >
+  <!-- <div class="col s12 m1" >
     <div class='valign-wrapper'>
       <h2 class="header valign">VS</h2>
     </div>
-  </div>
+  </div> -->
 
   <%= render partial: 'team_card', locals: { win: false, players: game.losing_team } %>
 </div>
