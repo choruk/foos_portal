@@ -28,8 +28,12 @@ class Game < ActiveRecord::Base
     number_of_winners == PLAYERS_NEEDED_TO_WIN
   end
 
+  def players
+    results.map(&:user)
+  end
+
   def players_needed_to_start
-    PLAYERS_NEEDED_TO_PLAY - results.map(&:user_id).length
+    PLAYERS_NEEDED_TO_PLAY - players.size
   end
 
   def players_needed_to_finish
