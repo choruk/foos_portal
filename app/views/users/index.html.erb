@@ -1,3 +1,5 @@
+<h2 class='header'>Users</h2>
+
 <div class="card-panel">
   <div class='card-content'>
     <table class='responsive-table'>
@@ -13,7 +15,7 @@
         <% @users.each do |user| %>
           <% stats = StatRetrievalService.find(user) %>
           <tr>
-            <td><%= user.slack_user_name %></td>
+            <td><%= link_to user.slack_user_name, user_path(user.slack_user_name) %></td>
             <td><%= stats[:win_ratio] %></td>
             <td><%= stats[:wins] %></td>
             <td><%= stats[:losses] %></td>

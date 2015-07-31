@@ -1,6 +1,5 @@
 <%= render partial: 'rankings_table' %>
 
-
 <% if Game.order('id desc').first.in_progress? %>
   <h2 class="header">Current Game</h2>
   <%= render partial: 'in_progress_game_row', locals: { game: Game.order('id desc').first } %>

@@ -4,6 +4,9 @@ class UsersController < ApplicationController
   end
 
   def show
-    @user = User.where(slack_user_name: params[:id]).first
+    # Hack for usernames with periods in them
+    username = params[:format].nil? ? params[:id] : [params[:id], params[:format]].join('.')
+    @user = User.where(slack_user_name: username).first
+    @stats = StatRetrievalService.find(@user)
   end
 end
