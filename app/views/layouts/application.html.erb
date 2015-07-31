@@ -2,13 +2,48 @@
 <html>
 <head>
   <title>FoosPortal</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.0/css/materialize.min.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
   <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
   <%= csrf_meta_tags %>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 </head>
 <body>
 
-<%= yield %>
+<header>
 
+<nav>
+  <div class="container">
+    <div class="nav-wrapper">
+      <a href="#!" class="brand-logo">Foosball Portal</a>
+      <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="mdi-navigation-menu"></i></a>
+      <ul class="right hide-on-med-and-down">
+        <%= render partial: 'layouts/nav_links' %>
+      </ul>
+      <ul class="side-nav" id="mobile-demo">
+        <%= render partial: 'layouts/nav_links' %>
+      </ul>
+    </div>
+    </div>
+</nav>
+
+<div class="container">
+<%= yield %>
+</div>
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.0/js/materialize.min.js"></script>
+<script>
+  $(".button-collapse").sideNav();
+</script>
+
+<% if flash[:notice] %>
+  <script>
+    Materialize.toast('<span><%= flash[:notice] %></span>', 5000)
+  </script>
+<% end %>
+
+<%= yield :javascript %>
 </body>
 </html>

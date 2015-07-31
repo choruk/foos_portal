@@ -1,0 +1,31 @@
+ <ul class="collapsible" data-collapsible="accordion">
+  <li>
+    <div class="collapsible-header"><i class="material-icons">list</i>Show Rankings</div>
+    <div class="collapsible-body">
+      <table class='responsive-table'>
+        <thead>
+          <tr>
+            <th></th>
+            <th></th>
+            <th>User Name</th>
+            <th>Win Ratio</th>
+            <th>Wins</th>
+            <th>Losses</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% StatRetrievalService.rankings.each do |ranking| %>
+            <tr>
+              <td></td>
+              <td><%= ranking[:rank] %></td>
+              <td><%= link_to ranking[:slack_name], user_path(ranking[:slack_name]) %></td>
+              <td><%= ranking[:win_ratio] %></td>
+              <td><%= ranking[:wins] %></td>
+              <td><%= ranking[:losses] %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </li>
+ </ul>
