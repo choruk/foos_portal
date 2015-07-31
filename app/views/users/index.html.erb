@@ -1,0 +1,30 @@
+<h2 class='header'>Users</h2>
+
+<div class="card-panel">
+  <div class='card-content'>
+    <table class='responsive-table'>
+      <thead>
+        <tr>
+          <th>User Name</th>
+          <th>Win Ratio</th>
+          <th>Wins</th>
+          <th>Losses</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @users.each do |user| %>
+          <% stats = StatRetrievalService.find(user) %>
+          <tr>
+            <td><%= link_to user.slack_user_name, user_path(user.slack_user_name) %></td>
+            <td><%= stats[:win_ratio] %></td>
+            <td><%= stats[:wins] %></td>
+            <td><%= stats[:losses] %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <div class="card-action">
+    <%= will_paginate @users %>
+  </div>
+</div>

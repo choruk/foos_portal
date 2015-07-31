@@ -13,3 +13,19 @@
  *= require_tree .
  *= require_self
  */
+
+nav {
+  background-color: #546e7a;
+}
+
+.header {
+  font-weight:300;
+}
+
+.player-card-link {
+  color: #fff;
+}
+
+.player-card-link:hover {
+  text-decoration: underline;
+}

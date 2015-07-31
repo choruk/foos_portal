@@ -1,0 +1,5 @@
+<h5 class="header">Game <%= game.id %></h5>
+<div class="row">
+  <%= render partial: 'team_card', locals: { win: true, players: game.winning_team } %>
+  <%= render partial: 'team_card', locals: { win: false, players: game.losing_team } %>
+</div>

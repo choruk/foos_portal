@@ -1,0 +1,12 @@
+<div class="col s12 m6">
+  <div class="card <%= win ? 'green' : 'red' %> darken-3">
+    <div class="card-content white-text">
+      <span class="card-title"><%= win ? 'Winners' : 'Loosers' %></span>
+      <p class='flow-text'>
+        <% players.each do |player| %>
+          <%= link_to player.slack_user_name, user_path(player.slack_user_name), class: 'player-card-link' %><br>
+        <% end %>
+      </p>
+    </div>
+  </div>
+</div>
