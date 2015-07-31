@@ -21,3 +21,11 @@ nav {
 .header {
   font-weight:300;
 }
+
+.player-card-link {
+  color: #fff;
+}
+
+.player-card-link:hover {
+  text-decoration: underline;
+}
