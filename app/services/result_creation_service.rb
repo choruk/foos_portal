@@ -16,6 +16,7 @@ class ResultCreationService
 
     if game.reload.finished?
       game.update_attributes!(finished_at: Time.zone.now)
+      RankingCalculatorService.rank(game)
     end
     result
   end

@@ -17,6 +17,8 @@ class GamesController < ApplicationController
       player.results.create!(game: game, win: winners.include?(player))
     end
 
+    RankingCalculatorService.rank(game)
+
     flash[:notice] = 'Game successfully created!'
 
     redirect_to '/'
