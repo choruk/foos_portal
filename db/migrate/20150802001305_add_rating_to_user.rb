@@ -1,5 +1,11 @@
 class AddRatingToUser < ActiveRecord::Migration
-  def change
-    add_column :users, :elo_rating, :integer, null: false, default: 1500
+  def up
+    add_column :users, :rank, :integer, null: false, default: 1500
+
+    Game.order(:started_at).each { |g| RankingCalculatorService.rank(g) }
+  end
+
+  def down
+    remove_column :users, :rank
   end
 end

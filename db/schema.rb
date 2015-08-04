@@ -37,7 +37,7 @@ ActiveRecord::Schema.define(version: 20150802001305) do
     t.string   "slack_user_name",                null: false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "elo_rating",      default: 1500, null: false
+    t.integer  "rank",            default: 1500, null: false
   end
 
 end
