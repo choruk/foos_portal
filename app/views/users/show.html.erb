@@ -1,4 +1,4 @@
 <h2 class='header'><%= @user.slack_user_name %></h2>
 <div class='card-panel'>
-  <p class='flow-text'><%= @user.slack_user_name.capitalize %> has played a total of <%= @stats[:wins] + @stats[:losses] %> games, winning <%= @stats[:wins] > 0 ? @stats[:wins] : 'none' %> and losing <%= @stats[:losses] > 0 ? @stats[:losses] : 'none' %> for a win ratio of approximately <%= @stats[:win_ratio] %>. Their ELO rank is <%= @user.rank %>.</p>
+  <p class='flow-text'><%= @user.slack_user_name.capitalize %> has played a total of <%= @stats[:wins] + @stats[:losses] %> games, winning <%= @stats[:wins] > 0 ? @stats[:wins] : 'none' %> and losing <%= @stats[:losses] > 0 ? @stats[:losses] : 'none' %> for a win ratio of approximately <%= @stats[:win_ratio] %>. Their Elo rank is <%= @user.rank %>.</p>
 </div>

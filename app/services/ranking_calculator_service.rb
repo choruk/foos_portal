@@ -43,7 +43,7 @@ class RankingCalculatorService
 
     def q(rank)
       # 400 is arbitrary, but seems to be pretty universal among all the
-      #   implementations of ELO I've come across.
+      #   implementations of Elo's ranking system I've come across.
       10**(rank.to_f / 400)
     end
 

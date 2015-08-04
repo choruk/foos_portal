@@ -1,43 +1,52 @@
 class StatRetrievalService
-  def self.find(user)
-    user_stats = {
-      win_ratio: user.win_ratio,
-      wins: user.games_won,
-      losses: user.games_lost
-    }
-
-    return user_stats unless user.ranked?
-
-    user_stats[:rank] = rankings.find { |user_stats| user_stats[:slack_name] == user.slack_user_name }[:rank]
-    user_stats
-  end
-
-  def self.rankings
-    sorted_win_ratios = []
-    User.all.each do |user|
-      next unless user.ranked?
-      sorted_win_ratios.push({ win_ratio: user.win_ratio, slack_name: user.slack_user_name, wins: user.games_won, losses: user.games_lost })
+  class << self
+    def find(user)
+      wins = user.games_won
+      losses = user.games_lost
+      {
+        rank: user.rank,
+        win_ratio: User.calculate_win_ratio(wins, wins + losses),
+        wins: wins,
+        losses: losses
+      }
     end
-    sorted_win_ratios.sort! { |x,y| y[:win_ratio] <=> x[:win_ratio] }
-    determine_ranks(sorted_win_ratios)
-  end
 
-  ####PRIVATE METHODS####
+    def stats_string(user)
+      user_stats = find(user)
+      ["Elo Rank: #{user_stats[:rank]}",
+       "Wins: #{user_stats[:wins]}\tLosses: #{user_stats[:losses]}",
+       "#{user} has won #{user_stats[:win_ratio]}% of the games they have finished."]
+        .join("\n")
+    end
 
-  def self.determine_ranks(sorted_user_win_ratios)
-    previous_win_ratio = -1
-    current_rank = 0
-    players_at_rank = 1
-    sorted_user_win_ratios.each do |user_win_ratio_hash|
-      if user_win_ratio_hash[:win_ratio] != previous_win_ratio
-        current_rank += players_at_rank
-        players_at_rank = 0
-        previous_win_ratio = user_win_ratio_hash[:win_ratio]
+    def rankings
+      ranked_users = []
+      User.order('rank desc').each do |u|
+        next unless u.ranked?
+        wins = u.games_won
+        losses = u.games_lost
+        win_ratio = User.calculate_win_ratio(wins, wins + losses)
+
+        ranked_users << { slack_name: u.slack_user_name,
+                          rank: u.rank,
+                          wins: wins,
+                          losses: losses,
+                          win_ratio: win_ratio }
+
+        return ranked_users if ranked_users.size > 20
       end
+      ranked_users
+    end
 
-      user_win_ratio_hash[:rank] = current_rank
-      players_at_rank += 1
+    def rankings_string
+      result = ''
+      rankings.each do |r|
+        result += [r[:rank],
+                   r[:slack_name],
+                   "#{r[:wins]}-#{r[:losses]}"].join("\t")
+        result += "\n"
+      end
+      result
     end
   end
-  private_class_method :determine_ranks
 end
