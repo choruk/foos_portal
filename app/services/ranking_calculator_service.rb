@@ -21,16 +21,16 @@ class RankingCalculatorService
       #   ranked teammate counts as a more challenging game and vice versa.
       o_rank = opponent_1.rank + opponent_2.rank - teammate.rank
 
-      player.update_attributes(rank: new_elo(player.rank, o_rank, score))
+      player.update_attributes!(rank: new_elo(player.rank, o_rank, score))
     end
 
-    def new_elo(player, opponent, score)
+    def new_elo(player_rank, opponent_rank, score)
       # The player's ranking is affected by the K Factor times the chance they
       #   had of winning minus the actual result. E.g. if a player has a .75
       #   chance of winning, a K Factor of 32, and loses, they will lose 24
       #   points.
-      (player + k_factor(player) *
-        (score - expected_score(player, opponent))).round
+      (player_rank + k_factor(player_rank) *
+        (score - expected_score(player_rank, opponent_rank))).round
     end
 
     def expected_score(player_rank, opponent_rank)
