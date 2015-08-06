@@ -6,6 +6,7 @@
       <thead>
         <tr>
           <th>User Name</th>
+          <th>Elo Rank</th>
           <th>Win Ratio</th>
           <th>Wins</th>
           <th>Losses</th>
@@ -16,6 +17,7 @@
           <% stats = StatRetrievalService.find(user) %>
           <tr>
             <td><%= link_to user.slack_user_name, user_path(user.slack_user_name) %></td>
+            <td><%= stats[:rank] == 1500 ? 'Unranked' : stats[:rank] %></td>
             <td><%= stats[:win_ratio] %></td>
             <td><%= stats[:wins] %></td>
             <td><%= stats[:losses] %></td>

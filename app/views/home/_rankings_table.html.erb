@@ -6,20 +6,20 @@
         <thead>
           <tr>
             <th></th>
-            <th></th>
+            <th>Elo</th>
             <th>User Name</th>
-            <th>Win Ratio</th>
+            <th>Win Percentage</th>
             <th>Wins</th>
             <th>Losses</th>
           </tr>
         </thead>
         <tbody>
-          <% StatRetrievalService.rankings.each do |ranking| %>
+          <% StatRetrievalService.rankings(limit: 20).each do |ranking| %>
             <tr>
               <td></td>
               <td><%= ranking[:rank] %></td>
               <td><%= link_to ranking[:slack_name], user_path(ranking[:slack_name]) %></td>
-              <td><%= ranking[:win_ratio] %></td>
+              <td><%= ranking[:win_ratio] %>%</td>
               <td><%= ranking[:wins] %></td>
               <td><%= ranking[:losses] %></td>
             </tr>

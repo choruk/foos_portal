@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150724040532) do
+ActiveRecord::Schema.define(version: 20150802001305) do
 
   create_table "games", force: true do |t|
     t.datetime "finished_at"
@@ -33,10 +33,11 @@ ActiveRecord::Schema.define(version: 20150724040532) do
   add_index "results", ["user_id"], name: "fk_results_user_id_users", using: :btree
 
   create_table "users", force: true do |t|
-    t.string   "slack_user_id",   null: false
-    t.string   "slack_user_name", null: false
+    t.string   "slack_user_id",                  null: false
+    t.string   "slack_user_name",                null: false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "rank",            default: 1500, null: false
   end
 
 end
