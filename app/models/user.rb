@@ -14,7 +14,7 @@ class User < ActiveRecord::Base
   end
 
   def games_won
-    results.wins.size
+    results.finished_wins.size
   end
 
   def win_ratio
