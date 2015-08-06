@@ -94,7 +94,7 @@ class SlackCoordinatorController < ApplicationController
       json_result[:text] = StatRetrievalService.stats_string(@user)
 
     when 'rankings'
-      rankings = StatRetrievalService.rankings_string
+      rankings = StatRetrievalService.rankings_string(limit: 15)
       if rankings.present?
         json_result[:text] = rankings
       else

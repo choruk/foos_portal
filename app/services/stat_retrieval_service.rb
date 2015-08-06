@@ -19,10 +19,9 @@ class StatRetrievalService
         .join("\n")
     end
 
-    def rankings
+    def rankings(limit: 1000)
       ranked_users = []
-      User.order('rank desc').each do |u|
-        next unless u.ranked?
+      User.where('rank != 1500').order('rank desc').limit(limit).each do |u|
         wins = u.games_won
         losses = u.games_lost
         win_ratio = User.calculate_win_ratio(wins, wins + losses)
@@ -32,15 +31,13 @@ class StatRetrievalService
                           wins: wins,
                           losses: losses,
                           win_ratio: win_ratio }
-
-        return ranked_users if ranked_users.size > 20
       end
       ranked_users
     end
 
-    def rankings_string
+    def rankings_string(limit: 1000)
       result = ''
-      rankings.each do |r|
+      rankings(limit: limit).each do |r|
         result += [r[:rank],
                    r[:slack_name],
                    "#{r[:wins]}-#{r[:losses]}"].join("\t")
