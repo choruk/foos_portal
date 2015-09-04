@@ -129,7 +129,9 @@ class SlackCoordinatorController < ApplicationController
   end
 
   def find_user
-    @user = User.where(slack_user_id: user_params[:user_id], slack_user_name: user_params[:user_name]).first_or_create!
+    @user = User.where(slack_user_id: user_params[:user_id]).first_or_create!(slack_user_name: user_params[:user_name])
+    #handle people changing their slack username
+    @user.update_attributes!(slack_user_name: user_params[:user_name]) if @user.slack_user_name != user_params[:user_name] && user_params[:user_name].present?
   end
 
   def command_message
