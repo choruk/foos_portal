@@ -57,7 +57,26 @@ class Game < ActiveRecord::Base
     results.reject(&:win).map(&:user)
   end
 
+  def suggested_matchup
+    sorted = players.sort_by(&:rank).reverse
+
+    matchup = [first_team(sorted),second_team(sorted)].join(' vs. ')
+    "suggested matchup: #{matchup}"
+  end
+
   private
+
+  def first_team(sorted_players)
+    team_mentions([sorted_players[0],sorted_players[3]])
+  end
+
+  def second_team(sorted_players)
+    team_mentions([sorted_players[1],sorted_players[2]])
+  end
+
+  def team_mentions(team)
+    team.map(&:mention_and_rank).join(' and ')
+  end
 
   def number_of_winners
     results.where(win: true).length
