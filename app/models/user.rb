@@ -8,6 +8,14 @@ class User < ActiveRecord::Base
     slack_user_name
   end
 
+  def mention
+    "@#{slack_user_name}"
+  end
+
+  def mention_and_rank
+    "#{mention} (#{rank})"
+  end
+
   def games_finished
     results.finished.size
   end
