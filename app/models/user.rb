@@ -9,7 +9,7 @@ class User < ActiveRecord::Base
   end
 
   def mention
-    "@#{slack_user_name}"
+    "<@#{slack_user_id}|#{slack_user_name}>"
   end
 
   def mention_and_rank

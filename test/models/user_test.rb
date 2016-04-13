@@ -11,4 +11,10 @@ class UserTest < ActiveSupport::TestCase
       assert u.errors[attr].blank?
     end
   end
+
+  def test_mention
+    u = User.new slack_user_name: 'bob', slack_user_id: '1234'
+
+    assert_equal '<@1234|bob>', u.mention
+  end
 end
