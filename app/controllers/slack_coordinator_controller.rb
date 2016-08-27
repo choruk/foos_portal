@@ -94,11 +94,12 @@ class SlackCoordinatorController < ApplicationController
       json_result[:text] = StatRetrievalService.stats_string(@user)
 
     when 'rankings'
-      rankings = StatRetrievalService.rankings_string(limit: 15)
+      rankings = StatRetrievalService.rankings_string(limit: 20)
       if rankings.present?
-        json_result[:text] = rankings
+        json_result[:text] = "You must play #{User::GAMES_NEEDED_FOR_RANKING} games to be ranked.\n"
+        json_result[:text] += rankings
       else
-        json_result[:text] = 'There are no ranked players yet.'
+        json_result[:text] = "No players have played #{User::GAMES_NEEDED_FOR_RANKING} games."
       end
 
     when 'help'
