@@ -17,4 +17,15 @@ class UserTest < ActiveSupport::TestCase
 
     assert_equal '<@1234|bob>', u.mention
   end
+
+  def test_stale
+    u_old = User.create!(slack_user_id: 123, slack_user_name: 123)
+    u_new = User.create!(slack_user_id: 456, slack_user_name: 456)
+
+    Result.create!(user: u_old, game: Game.create!, created_at: Time.now - 1.month)
+    Result.create!(user: u_new, game: Game.create!)
+
+    assert u_old.stale?
+    refute u_new.stale?
+  end
 end

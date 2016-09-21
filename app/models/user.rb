@@ -36,4 +36,8 @@ class User < ActiveRecord::Base
     return 0 unless finished > 0
     (won.to_f / finished * 100).round(2)
   end
+
+  def stale?
+    results.order(created_at: :desc).first.created_at < Time.now.utc - 2.weeks
+  end
 end
