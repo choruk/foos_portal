@@ -22,6 +22,7 @@ class StatRetrievalService
     def rankings(limit: 1000)
       ranked_users = []
       User.where('rank != 1500').order('rank desc').limit(limit).each do |u|
+        next if u.stale?
         wins = u.games_won
         losses = u.games_lost
         win_ratio = User.calculate_win_ratio(wins, wins + losses)

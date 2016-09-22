@@ -1,6 +1,7 @@
 class UsersController < ApplicationController
   def index
-    @users = User.order('rank desc').paginate(page: params[:page], per_page: 50)
+    @users = User.all.sort { |a, b| a.stale? ? -1 : (b.stale? ? 1 : (a.rank <=> b.rank)) }
+                 .reverse.paginate(page: params[:page], per_page: 50)
   end
 
   def show

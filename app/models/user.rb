@@ -1,8 +1,8 @@
 class User < ActiveRecord::Base
   has_many :results
 
-  validates_presence_of :slack_user_id, :slack_user_name
-  validates_uniqueness_of :slack_user_id
+  validates :slack_user_id, :slack_user_name, presence: true
+  validates :slack_user_id, uniqueness: true
 
   def to_s
     slack_user_name
@@ -38,6 +38,7 @@ class User < ActiveRecord::Base
   end
 
   def stale?
+    return true if results.empty?
     results.order(created_at: :desc).first.created_at < Time.now.utc - 2.weeks
   end
 end
