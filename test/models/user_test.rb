@@ -23,9 +23,9 @@ class UserTest < ActiveSupport::TestCase
     u_new = User.create!(slack_user_id: 456, slack_user_name: 456)
 
     Result.create!(user: u_old, game: Game.create!, created_at: Time.now - 1.month)
-    Result.create!(user: u_new, game: Game.create!)
+    5.times { Result.create!(user: u_new, game: Game.create!) }
 
-    assert u_old.stale?
-    refute u_new.stale?
+    assert u_old.unranked?
+    refute u_new.unranked?
   end
 end

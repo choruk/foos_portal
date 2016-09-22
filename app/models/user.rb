@@ -37,8 +37,8 @@ class User < ActiveRecord::Base
     (won.to_f / finished * 100).round(2)
   end
 
-  def stale?
-    return true if results.empty?
+  def unranked?
+    return true if results.size < 5
     results.order(created_at: :desc).first.created_at < Time.now.utc - 2.weeks
   end
 end
