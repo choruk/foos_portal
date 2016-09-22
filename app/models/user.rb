@@ -1,8 +1,8 @@
 class User < ActiveRecord::Base
   has_many :results
 
-  validates_presence_of :slack_user_id, :slack_user_name
-  validates_uniqueness_of :slack_user_id
+  validates :slack_user_id, :slack_user_name, presence: true
+  validates :slack_user_id, uniqueness: true
 
   def to_s
     slack_user_name
@@ -35,5 +35,10 @@ class User < ActiveRecord::Base
   def self.calculate_win_ratio(won, finished)
     return 0 unless finished > 0
     (won.to_f / finished * 100).round(2)
+  end
+
+  def unranked?
+    return true if results.size < 5
+    results.order(created_at: :desc).first.created_at < Time.now.utc - 2.weeks
   end
 end
