@@ -18,16 +18,13 @@ class GameTest < ActiveSupport::TestCase
       ResultCreationService.create(users.first)
       ResultCreationService.create(users.second)
     end
-    users[0].update_attributes!(rank: 1500)
-    users[1].update_attributes!(rank: 1400)
-    users[2].update_attributes!(rank: 1300)
-    users[3].update_attributes!(rank: 1200)
+
     @game = GameCreationService.create(users.pop)
     users.each do |user|
       @game = GameJoiningService.join(user)
     end
 
-    assert_equal 'suggested matchup: <@1|joe> (1513) and <@4|averell> (1188) vs. <@2|william> (1413) and <@3|jack> (1288)', @game.suggested_matchup
+    assert_equal 'suggested matchup: <@1|joe> (1513) and <@4|averell> (1187) vs. <@2|william> (1413) and <@3|jack> (1287)', @game.suggested_matchup
   end
 
   def test_suggested_matchup__unranked
