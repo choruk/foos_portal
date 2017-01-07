@@ -23,7 +23,7 @@ class StatRetrievalService
       ranked_users = []
       User.all.order('rank desc').each do |u|
         break if ranked_users.count > limit
-        next unless u.is_ranked?
+        next unless u.is_ranked? && u.is_active?
 
         wins = u.games_won
         losses = u.games_lost
