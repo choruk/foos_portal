@@ -3,9 +3,11 @@ class RankingCalculatorService
     def rank(game)
       return unless game.finished?
 
-      winners = game.winning_team
-      losers = game.losing_team
-      old_ranks = game.players.map { |p| [p, p.rank] }.to_h
+      @game = game
+
+      winners = @game.winning_team
+      losers = @game.losing_team
+      old_ranks = @game.players.map { |p| [p, p.rank] }.to_h
 
       update_player(winners[0], winners[1], losers[0], losers[1], 1, old_ranks)
       update_player(winners[1], winners[0], losers[0], losers[1], 1, old_ranks)
@@ -23,6 +25,14 @@ class RankingCalculatorService
       o_rank = old_ranks[opponent_1] + old_ranks[opponent_2] - old_ranks[teammate]
 
       player.update_attributes!(rank: new_elo(old_ranks[player], o_rank, score))
+      update_player_result(player)
+    end
+
+    def update_player_result(player)
+      @game.results.find { |result| result.user == player }.update_attributes!(
+        rank: player.rank,
+        ranked: true
+      )
     end
 
     def new_elo(player_rank, opponent_rank, score)
