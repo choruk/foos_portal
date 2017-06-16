@@ -5,5 +5,6 @@
 
 <div class="card-panel">
   <p class="flow-text">Elo History</p>
-  <%= line_chart User.find(@user.id).results.ranked_results.map { |result| [result.created_at, result.rank] }, min: 1000, max: 2000%>
+  <% ranked_results = User.find(@user.id).results.ranked_results  %>
+  <%= line_chart ranked_results.map { |result| [result.created_at, result.rank] }, min: ranked_results.minimum(:rank) - 100, max: ranked_results.maximum(:rank) + 100%>
 </div>
