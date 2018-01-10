@@ -58,7 +58,12 @@ class Game < ActiveRecord::Base
   end
 
   def suggested_matchup
-    return "No suggested matchup because not all players have played #{User::GAMES_NEEDED_FOR_RANKING} games" unless players.all?(&:is_ranked?)
+    unless players.all?(&:is_ranked?)
+      random_players = players.shuffle
+      matchup = [first_team(random_players), second_team(random_players)].join(' vs. ')
+      return "randomized matchup (not all players yet ranked!): #{matchup}"
+    end
+
     sorted = players.sort_by(&:rank).reverse
 
     matchup = [first_team(sorted),second_team(sorted)].join(' vs. ')
