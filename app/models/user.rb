@@ -1,4 +1,7 @@
 class User < ActiveRecord::Base
+  GAMES_NEEDED_FOR_RANKING = 5.freeze
+  DAYS_UNTIL_INACTIVE = 14
+
   has_many :results
 
   validates_presence_of :slack_user_id, :slack_user_name
@@ -30,6 +33,14 @@ class User < ActiveRecord::Base
 
   def games_lost
     games_finished - games_won
+  end
+
+  def is_ranked?
+    games_finished >= GAMES_NEEDED_FOR_RANKING
+  end
+
+  def is_active?
+    results.last.created_at > Time.now.utc - DAYS_UNTIL_INACTIVE.days
   end
 
   def self.calculate_win_ratio(won, finished)

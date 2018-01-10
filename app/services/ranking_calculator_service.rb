@@ -3,25 +3,36 @@ class RankingCalculatorService
     def rank(game)
       return unless game.finished?
 
-      winners = game.winning_team
-      losers = game.losing_team
+      @game = game
 
-      update_player(winners[0], winners[1], losers[0], losers[1], 1)
-      update_player(winners[1], winners[0], losers[0], losers[1], 1)
+      winners = @game.winning_team
+      losers = @game.losing_team
+      old_ranks = @game.players.map { |p| [p, p.rank] }.to_h
 
-      update_player(losers[0], losers[1], winners[0], winners[1], 0)
-      update_player(losers[1], losers[0], winners[0], winners[1], 0)
+      update_player(winners[0], winners[1], losers[0], losers[1], 1, old_ranks)
+      update_player(winners[1], winners[0], losers[0], losers[1], 1, old_ranks)
+
+      update_player(losers[0], losers[1], winners[0], winners[1], 0, old_ranks)
+      update_player(losers[1], losers[0], winners[0], winners[1], 0, old_ranks)
     end
 
     private
 
-    def update_player(player, teammate, opponent_1, opponent_2, score)
+    def update_player(player, teammate, opponent_1, opponent_2, score, old_ranks)
       # To account for the rank of the teammate, we sum the opponents then
       #   subtract the rank of the teammate. This way, playing with a lower
       #   ranked teammate counts as a more challenging game and vice versa.
-      o_rank = opponent_1.rank + opponent_2.rank - teammate.rank
+      o_rank = old_ranks[opponent_1] + old_ranks[opponent_2] - old_ranks[teammate]
 
-      player.update_attributes!(rank: new_elo(player.rank, o_rank, score))
+      player.update_attributes!(rank: new_elo(old_ranks[player], o_rank, score))
+      update_player_result(player)
+    end
+
+    def update_player_result(player)
+      @game.results.find { |result| result.user == player }.update_attributes!(
+        rank: player.rank,
+        ranked: true
+      )
     end
 
     def new_elo(player_rank, opponent_rank, score)
