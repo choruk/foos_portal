@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class GameTest < ActiveSupport::TestCase
+class MeetingRoomDirectionTest < ActiveSupport::TestCase
   def test_valid
     mrd1 = MeetingRoomDirection.new(room_name: 'Camino', direction: 'Go Right', notes: 'Max 6 people')
     assert_predicate mrd1, :valid?
