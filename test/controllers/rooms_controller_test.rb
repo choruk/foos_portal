@@ -1,26 +1,26 @@
 require 'test_helper'
 
 class RoomsControllerTest < ActionController::TestCase
-  def test_show__found
+  def test_index__found
     MeetingRoomDirection.create!(room_name: 'DelSol', direction: 'Go left and then go right.')
 
-    get :show, id: 'Del Sol'
+    get :index, { text: 'Del Sol', token: '12345' }
     assert_response :ok
     assert_equal 'Go left and then go right.', response.body
 
-    get :show, id: 'DelSol'
+    get :index, { text: 'DelSol', token: '12345' }
     assert_response :ok
     assert_equal 'Go left and then go right.', response.body
 
     MeetingRoomDirection.create!(room_name: 'bodega', direction: 'Go right.', notes: 'Maximum 6 people')
-    get :show, id: 'bodega'
+    get :index, { text: 'bodega', token: '12345' }
     assert_response :ok
     assert_equal 'Go right. Notes: Maximum 6 people', response.body
 
   end
 
   def test_show__not_found
-    get :show, id: 'Camino'
+    get :index, { text: 'camino', token: '12345' }
 
     assert_response :ok
     assert_equal 'Sorry, room not found.', response.body

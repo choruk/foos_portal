@@ -11,8 +11,9 @@ class RoomsController < ApplicationController
     end
   end
 
-  def show
-    data = MeetingRoomDirection.where(room_name: params[:id].gsub(' ', '').downcase).first
+  def index
+    room_name = index_params[:text]
+    data = MeetingRoomDirection.where(room_name: room_name.gsub(' ', '').downcase).first
     if data.present?
       notes = data.notes.present? ? " Notes: #{data.notes}" : ''
       response = "#{data.direction}#{notes}"
@@ -20,6 +21,12 @@ class RoomsController < ApplicationController
     else
       render plain: 'Sorry, room not found.'
     end
+  end
+  
+  private
+  
+  def index_params
+    params.permit(:text)
   end
 
   def create_params
