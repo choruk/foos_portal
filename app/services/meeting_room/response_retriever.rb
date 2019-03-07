@@ -9,11 +9,24 @@ module MeetingRoom
       case request
       when 'map'
         return FLOOR_MAP_URL
+      when 'list'
+        rooms = MeetingRoomDirection.all.map do |room|
+          "#{room.id}. #{room.room_name}"
+        end.join("\n")
+
+        response = <<-list
+        ```
+          #{rooms}
+        ```
+        list
+
+        return response
       when 'help'
         response = <<-help
         ```
           /meetingroom Camino --> direction how to go to meeting room Camino
           /meetingroom map    --> show floor plan map
+          /meetingroom list   --> show all meeting rooms name
         ```
         help
 
@@ -21,7 +34,7 @@ module MeetingRoom
       else
         data = MeetingRoomDirection.where(room_name: request).first
         if data.present?
-          notes = data.notes.present? ? " Notes: #{data.notes}" : ''
+          notes = data.notes.present? ? " *Notes:* #{data.notes}" : ''
           response = "#{original_request_text} - #{data.direction}#{notes}"
           return response
         else
