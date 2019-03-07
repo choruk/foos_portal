@@ -16,15 +16,15 @@ module MeetingRoom
 
       assert_equal 'Sorry, room not found.', MeetingRoom::ResponseRetriever.retrieve('Del Sol')
 
-      delsol = MeetingRoomDirection.create!(room_name: 'delsol', direction: 'Go left and then go right.')
+      delsol = MeetingRoomDirection.create!(room_name: 'delsol', direction: 'Go left and then go right.', image: 'example.com/test.jpg')
 
-      assert_equal 'Del Sol - Go left and then go right.', MeetingRoom::ResponseRetriever.retrieve('Del Sol')
+      assert_equal 'Del Sol - Go left and then go right. example.com/test.jpg', MeetingRoom::ResponseRetriever.retrieve('Del Sol')
       MeetingRoomDirection.find_by(room_name: 'delsol').update!(notes: 'Maximum 6 people.')
 
-      assert_equal 'del sol - Go left and then go right. *Notes:* Maximum 6 people.', MeetingRoom::ResponseRetriever.retrieve('del sol')
+      assert_equal 'del sol - Go left and then go right. *Notes:* Maximum 6 people. example.com/test.jpg', MeetingRoom::ResponseRetriever.retrieve('del sol')
 
-      camino = MeetingRoomDirection.create!(room_name: 'camino', direction: 'Go left.')
-      bodega = MeetingRoomDirection.create!(room_name: 'bodega', direction: 'Go right.')
+      camino = MeetingRoomDirection.create!(room_name: 'camino', direction: 'Go left.', image: 'example.com/test.jpg')
+      bodega = MeetingRoomDirection.create!(room_name: 'bodega', direction: 'Go right.', image: 'example.com/test.jpg')
 
       expected_list = <<-list
         ```

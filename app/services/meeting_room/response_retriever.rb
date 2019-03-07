@@ -35,7 +35,7 @@ module MeetingRoom
         data = MeetingRoomDirection.where(room_name: request).first
         if data.present?
           notes = data.notes.present? ? " *Notes:* #{data.notes}" : ''
-          response = "#{original_request_text} - #{data.direction}#{notes}"
+          response = "#{original_request_text} - #{data.direction}#{notes} #{data.image}"
           return response
         else
           return 'Sorry, room not found.'
