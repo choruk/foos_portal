@@ -8,10 +8,6 @@ class RoomsControllerTest < ActionController::TestCase
     assert_response :ok
     assert_equal 'Del Sol - Go left and then go right.', response.body
 
-    get :index, { text: 'DelSol', token: '12345' }
-    assert_response :ok
-    assert_equal 'DelSol - Go left and then go right.', response.body
-
     MeetingRoomDirection.create!(room_name: 'bodega', direction: 'Go right.', notes: 'Maximum 6 people')
     get :index, { text: 'bodega', token: '12345' }
     assert_response :ok
@@ -41,14 +37,14 @@ class RoomsControllerTest < ActionController::TestCase
     MeetingRoomDirection.create!(room_name: 'camino', direction: 'Go left and then go right.')
 
     assert_no_difference 'MeetingRoomDirection.count' do
-      post :create, { room_name: 'Camino', direction: 'Turn left.', notes: 'Warmest room' }
+      post :create, { room_name: 'Camino', notes: 'Warmest room' }
     end
 
     assert_response :ok
-    assert_equal 'Update succeeded - Room: Camino, Direction: Turn left., Notes: Warmest room', response.body
+    assert_equal 'Update succeeded - Room: Camino, Direction: Go left and then go right., Notes: Warmest room', response.body
     room = MeetingRoomDirection.last
     assert_equal 'camino', room.room_name
-    assert_equal 'Turn left.', room.direction
+    assert_equal 'Go left and then go right.', room.direction
     assert_equal 'Warmest room', room.notes
   end
 
