@@ -5,7 +5,7 @@ Rails.application.routes.draw do
 
   resources :games, only: [:new, :create]
 
-  resources :rooms, only: [:show, :create]
+  resources :rooms, only: [:index, :create]
 
   get '' => 'home#index'
 end
