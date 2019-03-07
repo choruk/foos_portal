@@ -16,7 +16,7 @@ class RoomsController < ApplicationController
     data = MeetingRoomDirection.where(room_name: room_name.gsub(' ', '').downcase).first
     if data.present?
       notes = data.notes.present? ? " Notes: #{data.notes}" : ''
-      response = "#{data.direction}#{notes}"
+      response = "#{room_name} - #{data.direction}#{notes}"
       render plain: response
     else
       render plain: 'Sorry, room not found.'

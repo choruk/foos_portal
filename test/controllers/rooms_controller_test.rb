@@ -6,17 +6,16 @@ class RoomsControllerTest < ActionController::TestCase
 
     get :index, { text: 'Del Sol', token: '12345' }
     assert_response :ok
-    assert_equal 'Go left and then go right.', response.body
+    assert_equal 'Del Sol - Go left and then go right.', response.body
 
     get :index, { text: 'DelSol', token: '12345' }
     assert_response :ok
-    assert_equal 'Go left and then go right.', response.body
+    assert_equal 'DelSol - Go left and then go right.', response.body
 
     MeetingRoomDirection.create!(room_name: 'bodega', direction: 'Go right.', notes: 'Maximum 6 people')
     get :index, { text: 'bodega', token: '12345' }
     assert_response :ok
-    assert_equal 'Go right. Notes: Maximum 6 people', response.body
-
+    assert_equal 'bodega - Go right. Notes: Maximum 6 people', response.body
   end
 
   def test_show__not_found
