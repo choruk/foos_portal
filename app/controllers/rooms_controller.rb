@@ -6,8 +6,9 @@ class RoomsController < ApplicationController
 
     room_direction.direction = create_params[:direction] if create_params[:direction].present?
     room_direction.notes = create_params[:notes] if create_params[:notes].present?
+    room_direction.image = create_params[:image] if create_params[:image].present?
     if room_direction.save
-      render plain: "Update succeeded - Room: #{room_direction.room_name.capitalize}, Direction: #{room_direction.direction}, Notes: #{room_direction.notes}"
+      render plain: "Update succeeded - Room: #{room_direction.room_name.capitalize}, Direction: #{room_direction.direction}, *Notes:* #{room_direction.notes}. #{room_direction.image}"
     else
       render plain: 'Update failed - please double check params.'
     end
@@ -25,6 +26,6 @@ class RoomsController < ApplicationController
   end
 
   def create_params
-    params.permit(:room_name, :direction, :notes)
+    params.permit(:room_name, :direction, :notes, :image)
   end
 end
