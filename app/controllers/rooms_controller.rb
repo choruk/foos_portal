@@ -1,26 +1,22 @@
 class RoomsController < ApplicationController
+  skip_before_action :verify_authenticity_token
+
   def create
     room_direction = MeetingRoomDirection.where(room_name: create_params[:room_name].gsub(' ', '').downcase).first_or_initialize
 
-    room_direction.direction = create_params[:direction]
-    room_direction.notes = create_params[:notes]
+    room_direction.direction = create_params[:direction] if create_params[:direction].present?
+    room_direction.notes = create_params[:notes] if create_params[:notes].present?
+    room_direction.image = create_params[:image] if create_params[:image].present?
     if room_direction.save
-      render plain: "Update succeeded - Room: #{room_direction.room_name.capitalize}, Direction: #{room_direction.direction}, Notes: #{room_direction.notes}"
+      render plain: "Update succeeded - Room: #{room_direction.room_name.capitalize}, Direction: #{room_direction.direction}, *Notes:* #{room_direction.notes}. #{room_direction.image}"
     else
       render plain: 'Update failed - please double check params.'
     end
   end
 
   def index
-    room_name = index_params[:text]
-    data = MeetingRoomDirection.where(room_name: room_name.gsub(' ', '').downcase).first
-    if data.present?
-      notes = data.notes.present? ? " Notes: #{data.notes}" : ''
-      response = "#{data.direction}#{notes}"
-      render plain: response
-    else
-      render plain: 'Sorry, room not found.'
-    end
+    response = MeetingRoom::ResponseRetriever.retrieve(index_params[:text])
+    render plain: response
   end
   
   private
@@ -30,6 +26,6 @@ class RoomsController < ApplicationController
   end
 
   def create_params
-    params.permit(:room_name, :direction, :notes)
+    params.permit(:room_name, :direction, :notes, :image)
   end
 end

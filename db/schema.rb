@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190305230739) do
+ActiveRecord::Schema.define(version: 20190307212229) do
 
   create_table "games", force: true do |t|
     t.datetime "finished_at"
@@ -27,6 +27,7 @@ ActiveRecord::Schema.define(version: 20190305230739) do
     t.text     "notes"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "image",      null: false
   end
 
   create_table "results", force: true do |t|
