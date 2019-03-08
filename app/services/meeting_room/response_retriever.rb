@@ -8,37 +8,45 @@ module MeetingRoom
 
       case request
       when 'map'
-        return FLOOR_MAP_URL
+        return { text: FLOOR_MAP_URL }
       when 'list'
         rooms = MeetingRoomDirection.all.map do |room|
           "#{room.id}. #{room.room_name}"
         end.join("\n")
 
         response = <<-list
-        ```
-          #{rooms}
-        ```
+```
+#{rooms}
+```
         list
 
-        return response
+        return { text: response }
       when 'help'
         response = <<-help
         ```
-          /meetingroom Camino --> direction how to go to meeting room Camino
-          /meetingroom map    --> show floor plan map
-          /meetingroom list   --> show all meeting rooms name
+/meetingroom Camino --> direction how to go to meeting room Camino
+/meetingroom map    --> show floor plan map
+/meetingroom list   --> show all meeting rooms name
         ```
         help
 
-        return response
+        return { text: response }
       else
         data = MeetingRoomDirection.where(room_name: request).first
         if data.present?
           notes = data.notes.present? ? " *Notes:* #{data.notes}" : ''
-          response = "#{original_request_text} - #{data.direction}#{notes} #{data.image}"
+          response = {
+            text: "#{original_request_text} - #{data.direction}#{notes}",
+            attachments: [
+              {
+                title: original_request_text,
+                image_url: data.image
+              }
+            ]
+          }
           return response
         else
-          return 'Sorry, room not found.'
+          return { text: 'Sorry, room not found.' }
         end
       end
     end
