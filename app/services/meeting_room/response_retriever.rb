@@ -8,7 +8,7 @@ module MeetingRoom
 
       case request
       when 'map'
-        return { text: FLOOR_MAP_URL }
+        return { text: "Click on this link to see a floorplan of the Appfolio offices #{FLOOR_MAP_URL}" }
       when 'list'
         rooms = MeetingRoomDirection.all.map do |room|
           "#{room.id}. #{room.room_name}"

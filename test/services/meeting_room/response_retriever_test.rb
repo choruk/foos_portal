@@ -3,7 +3,7 @@ require 'test_helper'
 module MeetingRoom
   class ResponseRetrieverTest < ActiveSupport::TestCase
     def test_retrieve
-      expected_reponse = { text: 'https://wpsvc5.com/ESASSO026/' }
+      expected_reponse = { text: 'Click on this link to see a floorplan of the Appfolio offices https://wpsvc5.com/ESASSO026/' }
       assert_equal expected_reponse, MeetingRoom::ResponseRetriever.retrieve('map')
 
       expected_help_text = <<-help
