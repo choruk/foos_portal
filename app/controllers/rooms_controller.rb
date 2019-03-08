@@ -8,15 +8,16 @@ class RoomsController < ApplicationController
     room_direction.notes = create_params[:notes] if create_params[:notes].present?
     room_direction.image = create_params[:image] if create_params[:image].present?
     if room_direction.save
-      render plain: "Update succeeded - Room: #{room_direction.room_name.capitalize}, Direction: #{room_direction.direction}, *Notes:* #{room_direction.notes}. #{room_direction.image}"
+      text = "Update succeeded - Room: #{room_direction.room_name.capitalize}, Direction: #{room_direction.direction}, *Notes:* #{room_direction.notes}. #{room_direction.image}"
+      render json: { text: text }
     else
-      render plain: 'Update failed - please double check params.'
+      render json: { text: 'Update failed - please double check params.' }
     end
   end
 
   def index
     response = MeetingRoom::ResponseRetriever.retrieve(index_params[:text])
-    render plain: response
+    render json: response
   end
   
   private

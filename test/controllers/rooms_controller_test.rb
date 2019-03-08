@@ -6,19 +6,26 @@ class RoomsControllerTest < ActionController::TestCase
 
     get :index, { text: 'Del Sol', token: '12345' }
     assert_response :ok
-    assert_equal 'Del Sol - Go left and then go right. example.com/test.jpg', response.body
+    body = JSON.parse(response.body)
+    assert_equal 'Del Sol - Go left and then go right.', body['text']
+    assert_equal 'Del Sol', body['attachments'].first['title']
+    assert_equal 'example.com/test.jpg', body['attachments'].first['image_url']
 
     MeetingRoomDirection.create!(room_name: 'bodega', direction: 'Go right.', notes: 'Maximum 6 people', image: 'example.com/test.jpg')
     get :index, { text: 'bodega', token: '12345' }
     assert_response :ok
-    assert_equal 'bodega - Go right. *Notes:* Maximum 6 people example.com/test.jpg', response.body
+    body = JSON.parse(response.body)
+    assert_equal 'bodega - Go right. *Notes:* Maximum 6 people', body['text']
+    assert_equal 'bodega', body['attachments'].first['title']
+    assert_equal 'example.com/test.jpg', body['attachments'].first['image_url']
   end
 
-  def test_show__not_found
+  def test_index__not_found
     get :index, { text: 'camino', token: '12345' }
 
     assert_response :ok
-    assert_equal 'Sorry, room not found.', response.body
+    body = JSON.parse(response.body)
+    assert_equal 'Sorry, room not found.', body['text']
   end
 
   def test_create__success__new_record
@@ -28,6 +35,9 @@ class RoomsControllerTest < ActionController::TestCase
     end
 
     assert_response :ok
+    body = JSON.parse(response.body)
+
+    assert_equal 'Update succeeded - Room: Camino, Direction: Turn left, *Notes:* Warmest room. example.com/test.jpg', body['text']
     room = MeetingRoomDirection.last
     assert_equal 'camino', room.room_name
     assert_equal 'Turn left', room.direction
@@ -43,7 +53,9 @@ class RoomsControllerTest < ActionController::TestCase
     end
 
     assert_response :ok
-    assert_equal 'Update succeeded - Room: Camino, Direction: Go left and then go right., *Notes:* Warmest room. example.com/test.jpg', response.body
+    body = JSON.parse(response.body)
+
+    assert_equal 'Update succeeded - Room: Camino, Direction: Go left and then go right., *Notes:* Warmest room. example.com/test.jpg', body['text']
     room = MeetingRoomDirection.last
     assert_equal 'camino', room.room_name
     assert_equal 'Go left and then go right.', room.direction
@@ -55,6 +67,7 @@ class RoomsControllerTest < ActionController::TestCase
     post :create, { room_name: 'Camino' }
 
     assert_response :ok
-    assert_equal 'Update failed - please double check params.', response.body
+    body = JSON.parse(response.body)
+    assert_equal 'Update failed - please double check params.', body['text']
   end
 end
