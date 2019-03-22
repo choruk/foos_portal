@@ -32,7 +32,7 @@ module MeetingRoom
         ]
       }
       assert_equal expected_reponse, MeetingRoom::ResponseRetriever.retrieve('Del Sol')
-      MeetingRoomDirection.find_by(room_name: 'delsol').update!(notes: 'Maximum 6 people.')
+      delsol.update!(notes: 'Maximum 6 people.')
 
       expected_reponse = {
         text: 'del sol - Go left and then go right. *Notes:* Maximum 6 people.',
@@ -45,6 +45,18 @@ module MeetingRoom
       }
 
       assert_equal expected_reponse, MeetingRoom::ResponseRetriever.retrieve('del sol')
+      delsol.update!(online_meeting_link: 'go.me/delsol')
+
+      expected_reponse = {
+        text: 'Del Sol - Go left and then go right. *Notes:* Maximum 6 people. *GTM:* go.me/delsol',
+        attachments: [
+          {
+            title: 'Del Sol',
+            image_url: 'example.com/test.jpg'
+          }
+        ]
+      }
+      assert_equal expected_reponse, MeetingRoom::ResponseRetriever.retrieve('Del Sol')
 
       camino = MeetingRoomDirection.create!(room_name: 'camino', direction: 'Go left.', image: 'example.com/test.jpg')
       bodega = MeetingRoomDirection.create!(room_name: 'bodega', direction: 'Go right.', image: 'example.com/test.jpg')
