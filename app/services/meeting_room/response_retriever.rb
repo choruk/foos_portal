@@ -35,8 +35,9 @@ module MeetingRoom
         data = MeetingRoomDirection.where(room_name: request).first
         if data.present?
           notes = data.notes.present? ? " *Notes:* #{data.notes}" : ''
+          online_meeting_link = data.online_meeting_link.present? ? " *GTM:* #{data.online_meeting_link}" : ''
           response = {
-            text: "#{original_request_text} - #{data.direction}#{notes}",
+            text: "#{original_request_text} - #{data.direction}#{notes}#{online_meeting_link}",
             attachments: [
               {
                 title: original_request_text,
