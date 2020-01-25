@@ -7,5 +7,7 @@ Rails.application.routes.draw do
 
   resources :rooms, only: [:index, :create]
 
+  resources :channel_queues, only: [:index]
+
   get '' => 'home#index'
 end
