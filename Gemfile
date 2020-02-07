@@ -27,6 +27,7 @@ gem 'spring',        group: :development
 gem 'will_paginate'
 
 gem 'rest-client', '2.0.2'
+gem 'whenever', require: false
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
