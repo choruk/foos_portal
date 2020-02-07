@@ -39,4 +39,5 @@ Rails.application.configure do
 
   # ENV variables
   ENV['ATTR_ENCRYPTION_KEY'] = 'DUMMY_ENCRYPTION_KEY_ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  ENV['SLACK_WEBHOOKS'] = 'hook1, hook2'
 end
