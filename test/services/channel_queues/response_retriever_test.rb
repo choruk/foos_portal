@@ -3,6 +3,11 @@ require 'test_helper'
 module MeetingRoom
   class ResponseRetrieverTest < ActiveSupport::TestCase
     def test_retrieve__list
+      response = ChannelQueues::ResponseRetriever.retrieve('help', 'C123', 'my-channel', 'U123', 'my.user')
+      assert_equal "_/queue list_\t\tshow current queue in order from first to last\n_/queue join_\t\tjoin the queue\n_/queue leave_\t\tleave the queue\n_/queue charging_\t\tleave the queue", response[:text]
+    end
+
+    def test_retrieve__list
       channel_queue = ChannelQueue.create!(slack_channel_name: 'my-channel', slack_channel_id: 'C123')
 
       first_user = User.create!(slack_user_name: 'first.user', slack_user_id: 'U123')

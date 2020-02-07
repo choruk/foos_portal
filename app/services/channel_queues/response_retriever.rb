@@ -1,5 +1,12 @@
 module ChannelQueues
   class ResponseRetriever
+    ALL_COMMANDS = {
+      'list' => 'show current queue in order from first to last',
+      'join' => 'join the queue',
+      'leave' => 'leave the queue',
+      'charging' => 'leave the queue',
+    }.freeze
+
     def self.retrieve(original_request_text, channel_id, channel_name, user_id, user_name)
       channel_queue = find_channel_queue(channel_id, channel_name)
 
@@ -22,6 +29,15 @@ module ChannelQueues
         ChannelQueueMembership.where(user: user, channel_queue: channel_queue).destroy_all
 
         return { text: text }
+      when 'help'
+        json_result = {}
+        json_result[:text] = ''
+
+        ALL_COMMANDS.each do |command, description|
+          json_result[:text] += "_/queue #{command}_\t\t#{description}\n"
+        end
+
+        return json_result
       else
         return { text: 'Sorry, command not recognized.' }
       end
