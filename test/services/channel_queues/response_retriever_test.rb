@@ -34,6 +34,29 @@ module MeetingRoom
       assert_equal channel_queue, channel_queue_membership.channel_queue
     end
 
+    def test_retrieve__join__already_a_member
+      channel_queue = ChannelQueue.create!(slack_channel_name: 'my-channel', slack_channel_id: 'C123')
+      user = User.create!(slack_user_name: 'my.user', slack_user_id: 'U123')
+      ChannelQueueMembership.create!(user: user, channel_queue: channel_queue)
+
+      assert_no_difference 'ChannelQueueMembership.count' do
+        response = ChannelQueues::ResponseRetriever.retrieve('join', 'C123', 'my-channel', 'U123', 'my.user')
+        assert_equal 'my.user already in queue for my-channel.', response[:text]
+      end
+
+      channel_queue = ChannelQueue.last
+      assert_equal 'C123', channel_queue.slack_channel_id
+      assert_equal 'my-channel', channel_queue.slack_channel_name
+
+      user = User.last
+      assert_equal 'U123', user.slack_user_id
+      assert_equal 'my.user', user.slack_user_name
+
+      channel_queue_membership = ChannelQueueMembership.last
+      assert_equal user, channel_queue_membership.user
+      assert_equal channel_queue, channel_queue_membership.channel_queue
+    end
+
     def test_retrieve__leave
       channel_queue = ChannelQueue.create!(slack_channel_name: 'my-channel', slack_channel_id: 'C123')
       user = User.create!(slack_user_name: 'my.user', slack_user_id: 'U123')

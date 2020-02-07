@@ -10,6 +10,8 @@ module ChannelQueues
         return { text: channel_queue.members_string }
       when 'join'
         user = find_user(user_id, user_name)
+        return { text: "#{user.slack_user_name} already in queue for #{channel_queue.slack_channel_name}." } if ChannelQueueMembership.where(user: user, channel_queue: channel_queue).exists?
+
         ChannelQueueMembership.create!(user: user, channel_queue: channel_queue)
         return { text: "#{user.slack_user_name} joined queue for #{channel_queue.slack_channel_name}." }
       when 'leave', 'charging'
