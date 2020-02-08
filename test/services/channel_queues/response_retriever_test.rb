@@ -4,8 +4,22 @@ module MeetingRoom
   class ResponseRetrieverTest < ActiveSupport::TestCase
     def test_retrieve__help
       response = ChannelQueues::ResponseRetriever.retrieve('help', 'C123', 'my-channel', 'U123', 'my.user')
-      assert_equal "_/queue list_\t\tshow current queue in order from first to last\n_/queue join_\t\tjoin the queue\n_/queue leave_\t\tleave the queue\n_/queue charging_\t\tleave the queue", response[:text]
+      assert_equal "_/queue list_\t\tshow current queue in order from first to last\n_/queue list blast_\t\tshow current queue (to whole channel) in order from first to last\n_/queue join_\t\tjoin the queue\n_/queue leave_\t\tleave the queue\n_/queue charging_\t\tleave the queue", response[:text]
       assert_equal 'ephemeral', response[:response_type]
+    end
+
+    def test_retrieve__list_blast
+      channel_queue = ChannelQueue.create!(slack_channel_name: 'my-channel', slack_channel_id: 'C123')
+
+      first_user = User.create!(slack_user_name: 'first.user', slack_user_id: 'U123')
+      ChannelQueueMembership.create!(user: first_user, channel_queue: channel_queue)
+
+      second_user = User.create!(slack_user_name: 'second.user', slack_user_id: 'U124')
+      ChannelQueueMembership.create!(user: second_user, channel_queue: channel_queue)
+
+      response = ChannelQueues::ResponseRetriever.retrieve('list blast', 'C123', 'my-channel', 'U123', 'my.user')
+      assert_equal "```1. first.user\n2. second.user```", response[:text]
+      assert_equal 'in_channel', response[:response_type]
     end
 
     def test_retrieve__list
@@ -19,7 +33,7 @@ module MeetingRoom
 
       response = ChannelQueues::ResponseRetriever.retrieve('list', 'C123', 'my-channel', 'U123', 'my.user')
       assert_equal "```1. first.user\n2. second.user```", response[:text]
-      assert_equal 'in_channel', response[:response_type]
+      assert_equal 'ephemeral', response[:response_type]
     end
 
     def test_retrieve__join

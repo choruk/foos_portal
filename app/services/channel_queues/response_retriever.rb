@@ -2,6 +2,7 @@ module ChannelQueues
   class ResponseRetriever
     ALL_COMMANDS = {
       'list' => 'show current queue in order from first to last',
+      'list blast' => 'show current queue (to whole channel) in order from first to last',
       'join' => 'join the queue',
       'leave' => 'leave the queue',
       'charging' => 'leave the queue',
@@ -11,11 +12,14 @@ module ChannelQueues
       json_result = { response_type: 'in_channel' }
       channel_queue = find_channel_queue(channel_id, channel_name)
 
-      request = original_request_text.gsub(' ', '').downcase
+      request = original_request_text.downcase
 
       case request
+      when 'list blast'
+        json_result[:text] = channel_queue.members_string
       when 'list'
         json_result[:text] = channel_queue.members_string
+        json_result[:response_type] = 'ephemeral'
       when 'join'
         user = find_user(user_id, user_name)
         if ChannelQueueMembership.where(user: user, channel_queue: channel_queue).exists?
