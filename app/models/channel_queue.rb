@@ -5,6 +5,10 @@ class ChannelQueue < ActiveRecord::Base
   validates_uniqueness_of :slack_channel_id, :slack_channel_name
 
   def members_string
-    channel_queue_memberships.order(created_at: :asc).joins(:user).pluck(:slack_user_name).join(', ')
+    user_names = channel_queue_memberships.order(created_at: :asc).joins(:user).pluck(:slack_user_name)
+
+    user_names.each_with_index.map do |user_name, index|
+      "#{index + 1}. #{user_name}"
+    end.join(' ')
   end
 end
