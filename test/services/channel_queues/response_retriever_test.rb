@@ -50,7 +50,7 @@ module MeetingRoom
       assert_no_difference 'ChannelQueueMembership.count' do
         response = ChannelQueues::ResponseRetriever.retrieve('join', 'C123', 'my-channel', 'U123', 'my.user')
         assert_equal 'my.user already in queue for my-channel.', response[:text]
-        assert_equal 'in_channel', response[:response_type]
+        assert_equal 'ephemeral', response[:response_type]
       end
 
       channel_queue = ChannelQueue.last
@@ -82,7 +82,7 @@ module MeetingRoom
       assert_no_difference 'ChannelQueueMembership.count' do
         response = ChannelQueues::ResponseRetriever.retrieve('leave', 'C123', 'my-channel', 'U123', 'my.user')
         assert_equal 'my.user has left queue for my-channel.', response[:text]
-        assert_equal 'in_channel', response[:response_type]
+        assert_equal 'ephemeral', response[:response_type]
       end
     end
 
@@ -102,14 +102,14 @@ module MeetingRoom
       assert_no_difference 'ChannelQueueMembership.count' do
         response = ChannelQueues::ResponseRetriever.retrieve('charging', 'C123', 'my-channel', 'U123', 'my.user')
         assert_equal 'my.user has left queue for my-channel.', response[:text]
-        assert_equal 'in_channel', response[:response_type]
+        assert_equal 'ephemeral', response[:response_type]
       end
     end
 
     def test_retrieve__other
       response = ChannelQueues::ResponseRetriever.retrieve('other', 'C123', 'my-channel', 'U123', 'my.user')
       assert_equal 'Sorry, command not recognized.', response[:text]
-      assert_equal 'in_channel', response[:response_type]
+      assert_equal 'ephemeral', response[:response_type]
     end
   end
 end

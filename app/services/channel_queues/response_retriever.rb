@@ -18,25 +18,32 @@ module ChannelQueues
         json_result[:text] = channel_queue.members_string
       when 'join'
         user = find_user(user_id, user_name)
-        json_result[:text] = "#{user.slack_user_name} already in queue for #{channel_queue.slack_channel_name}." if ChannelQueueMembership.where(user: user, channel_queue: channel_queue).exists?
-        return json_result if ChannelQueueMembership.where(user: user, channel_queue: channel_queue).exists?
+        if ChannelQueueMembership.where(user: user, channel_queue: channel_queue).exists?
+          json_result[:text] = "#{user.slack_user_name} already in queue for #{channel_queue.slack_channel_name}."
+          json_result[:response_type] = 'ephemeral'
+          return json_result
+        end
 
         ChannelQueueMembership.create!(user: user, channel_queue: channel_queue)
         json_result[:text] = "#{user.slack_user_name} joined queue for #{channel_queue.slack_channel_name}."
       when 'leave', 'charging'
         user = find_user(user_id, user_name)
 
-        text = "#{user.slack_user_name} has left queue for #{channel_queue.slack_channel_name}."
+        json_result[:text] = "#{user.slack_user_name} has left queue for #{channel_queue.slack_channel_name}."
+
+        unless ChannelQueueMembership.where(user: user, channel_queue: channel_queue).exists?
+          json_result[:response_type] = 'ephemeral'
+          return json_result
+        end
 
         ChannelQueueMembership.where(user: user, channel_queue: channel_queue).destroy_all
-
-        json_result[:text] = text
       when 'help'
         json_result[:response_type] = 'ephemeral'
         json_result[:text] = ALL_COMMANDS.map do |command, description|
           "_/queue #{command}_\t\t#{description}"
         end.join("\n")
       else
+        json_result[:response_type] = 'ephemeral'
         json_result[:text] = 'Sorry, command not recognized.'
       end
 
