@@ -8,19 +8,21 @@ module ChannelQueues
     }.freeze
 
     def self.retrieve(original_request_text, channel_id, channel_name, user_id, user_name)
+      json_result = { response_type: 'in_channel' }
       channel_queue = find_channel_queue(channel_id, channel_name)
 
       request = original_request_text.gsub(' ', '').downcase
 
       case request
       when 'list'
-        return { text: channel_queue.members_string }
+        json_result[:text] = channel_queue.members_string
       when 'join'
         user = find_user(user_id, user_name)
-        return { text: "#{user.slack_user_name} already in queue for #{channel_queue.slack_channel_name}." } if ChannelQueueMembership.where(user: user, channel_queue: channel_queue).exists?
+        json_result[:text] = "#{user.slack_user_name} already in queue for #{channel_queue.slack_channel_name}." if ChannelQueueMembership.where(user: user, channel_queue: channel_queue).exists?
+        return json_result if ChannelQueueMembership.where(user: user, channel_queue: channel_queue).exists?
 
         ChannelQueueMembership.create!(user: user, channel_queue: channel_queue)
-        return { text: "#{user.slack_user_name} joined queue for #{channel_queue.slack_channel_name}." }
+        json_result[:text] = "#{user.slack_user_name} joined queue for #{channel_queue.slack_channel_name}."
       when 'leave', 'charging'
         user = find_user(user_id, user_name)
 
@@ -28,17 +30,17 @@ module ChannelQueues
 
         ChannelQueueMembership.where(user: user, channel_queue: channel_queue).destroy_all
 
-        return { text: text }
+        json_result[:text] = text
       when 'help'
-        json_result = {}
+        json_result[:response_type] = 'ephemeral'
         json_result[:text] = ALL_COMMANDS.map do |command, description|
           "_/queue #{command}_\t\t#{description}"
         end.join("\n")
-
-        return json_result
       else
-        return { text: 'Sorry, command not recognized.' }
+        json_result[:text] = 'Sorry, command not recognized.'
       end
+
+      return json_result
     end
 
     private
