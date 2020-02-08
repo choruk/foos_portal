@@ -2,7 +2,7 @@ require 'test_helper'
 
 module MeetingRoom
   class ResponseRetrieverTest < ActiveSupport::TestCase
-    def test_retrieve__list
+    def test_retrieve__help
       response = ChannelQueues::ResponseRetriever.retrieve('help', 'C123', 'my-channel', 'U123', 'my.user')
       assert_equal "_/queue list_\t\tshow current queue in order from first to last\n_/queue join_\t\tjoin the queue\n_/queue leave_\t\tleave the queue\n_/queue charging_\t\tleave the queue", response[:text]
     end

@@ -31,11 +31,9 @@ module ChannelQueues
         return { text: text }
       when 'help'
         json_result = {}
-        json_result[:text] = ''
-
-        ALL_COMMANDS.each do |command, description|
-          json_result[:text] += "_/queue #{command}_\t\t#{description}\n"
-        end
+        json_result[:text] = ALL_COMMANDS.map do |command, description|
+          "_/queue #{command}_\t\t#{description}"
+        end.join("\n")
 
         return json_result
       else
