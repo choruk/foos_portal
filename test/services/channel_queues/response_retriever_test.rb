@@ -18,7 +18,7 @@ module MeetingRoom
       ChannelQueueMembership.create!(user: second_user, channel_queue: channel_queue)
 
       response = ChannelQueues::ResponseRetriever.retrieve('list', 'C123', 'my-channel', 'U123', 'my.user')
-      assert_equal 'first.user, second.user', response[:text]
+      assert_equal "```1. first.user\n2. second.user```", response[:text]
       assert_equal 'in_channel', response[:response_type]
     end
 
