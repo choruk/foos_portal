@@ -53,4 +53,10 @@ class ChannelQueueTest < ActiveSupport::TestCase
 
     assert_equal '1. jane 2. joe', channel_queue.members_string
   end
+
+  def test_members_string__empty
+    channel_queue = ChannelQueue.create!(slack_channel_name: 'ev-chargers-of-appfolio', slack_channel_id: 'U1234')
+
+    assert_equal 'Queue is empty', channel_queue.members_string
+  end
 end
