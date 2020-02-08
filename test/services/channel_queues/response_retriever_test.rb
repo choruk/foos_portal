@@ -2,9 +2,10 @@ require 'test_helper'
 
 module MeetingRoom
   class ResponseRetrieverTest < ActiveSupport::TestCase
-    def test_retrieve__list
+    def test_retrieve__help
       response = ChannelQueues::ResponseRetriever.retrieve('help', 'C123', 'my-channel', 'U123', 'my.user')
       assert_equal "_/queue list_\t\tshow current queue in order from first to last\n_/queue join_\t\tjoin the queue\n_/queue leave_\t\tleave the queue\n_/queue charging_\t\tleave the queue", response[:text]
+      assert_equal 'ephemeral', response[:response_type]
     end
 
     def test_retrieve__list
@@ -18,12 +19,14 @@ module MeetingRoom
 
       response = ChannelQueues::ResponseRetriever.retrieve('list', 'C123', 'my-channel', 'U123', 'my.user')
       assert_equal 'first.user, second.user', response[:text]
+      assert_equal 'in_channel', response[:response_type]
     end
 
     def test_retrieve__join
       assert_difference 'ChannelQueueMembership.count' do
         response = ChannelQueues::ResponseRetriever.retrieve('join', 'C123', 'my-channel', 'U123', 'my.user')
         assert_equal 'my.user joined queue for my-channel.', response[:text]
+        assert_equal 'in_channel', response[:response_type]
       end
 
       channel_queue = ChannelQueue.last
@@ -47,6 +50,7 @@ module MeetingRoom
       assert_no_difference 'ChannelQueueMembership.count' do
         response = ChannelQueues::ResponseRetriever.retrieve('join', 'C123', 'my-channel', 'U123', 'my.user')
         assert_equal 'my.user already in queue for my-channel.', response[:text]
+        assert_equal 'in_channel', response[:response_type]
       end
 
       channel_queue = ChannelQueue.last
@@ -70,6 +74,7 @@ module MeetingRoom
       assert_difference 'ChannelQueueMembership.count', -1 do
         response = ChannelQueues::ResponseRetriever.retrieve('leave', 'C123', 'my-channel', 'U123', 'my.user')
         assert_equal 'my.user has left queue for my-channel.', response[:text]
+        assert_equal 'in_channel', response[:response_type]
       end
     end
 
@@ -77,6 +82,7 @@ module MeetingRoom
       assert_no_difference 'ChannelQueueMembership.count' do
         response = ChannelQueues::ResponseRetriever.retrieve('leave', 'C123', 'my-channel', 'U123', 'my.user')
         assert_equal 'my.user has left queue for my-channel.', response[:text]
+        assert_equal 'in_channel', response[:response_type]
       end
     end
 
@@ -88,6 +94,7 @@ module MeetingRoom
       assert_difference 'ChannelQueueMembership.count', -1 do
         response = ChannelQueues::ResponseRetriever.retrieve('charging', 'C123', 'my-channel', 'U123', 'my.user')
         assert_equal 'my.user has left queue for my-channel.', response[:text]
+        assert_equal 'in_channel', response[:response_type]
       end
     end
 
@@ -95,12 +102,14 @@ module MeetingRoom
       assert_no_difference 'ChannelQueueMembership.count' do
         response = ChannelQueues::ResponseRetriever.retrieve('charging', 'C123', 'my-channel', 'U123', 'my.user')
         assert_equal 'my.user has left queue for my-channel.', response[:text]
+        assert_equal 'in_channel', response[:response_type]
       end
     end
 
     def test_retrieve__other
       response = ChannelQueues::ResponseRetriever.retrieve('other', 'C123', 'my-channel', 'U123', 'my.user')
       assert_equal 'Sorry, command not recognized.', response[:text]
+      assert_equal 'in_channel', response[:response_type]
     end
   end
 end
