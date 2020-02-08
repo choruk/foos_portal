@@ -11,7 +11,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190731183541) do
+ActiveRecord::Schema.define(version: 20200124232405) do
+
+  create_table "channel_queue_memberships", force: true do |t|
+    t.integer  "user_id",          null: false
+    t.integer  "channel_queue_id", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "channel_queue_memberships", ["user_id", "channel_queue_id"], name: "index_channel_queue_memberships_on_user_id_and_channel_queue_id", unique: true, using: :btree
+
+  create_table "channel_queues", force: true do |t|
+    t.string "slack_channel_id",   null: false
+    t.string "slack_channel_name", null: false
+  end
 
   create_table "games", force: true do |t|
     t.datetime "finished_at"
