@@ -51,7 +51,7 @@ class ChannelQueueTest < ActiveSupport::TestCase
     channel_queue_membership = ChannelQueueMembership.create!(channel_queue: channel_queue, user: User.create!(slack_user_id: '1', slack_user_name: 'joe', rank: 1500), created_at: Time.now)
     channel_queue_membership = ChannelQueueMembership.create!(channel_queue: channel_queue, user: User.create!(slack_user_id: '2', slack_user_name: 'jane', rank: 1500), created_at: 5.minutes.ago)
 
-    assert_equal '1. jane 2. joe', channel_queue.members_string
+    assert_equal "```1. jane\n2. joe```", channel_queue.members_string
   end
 
   def test_members_string__empty

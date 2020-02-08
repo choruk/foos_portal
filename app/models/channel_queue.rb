@@ -8,8 +8,10 @@ class ChannelQueue < ActiveRecord::Base
     user_names = channel_queue_memberships.order(created_at: :asc).joins(:user).pluck(:slack_user_name)
     return 'Queue is empty' if user_names.empty?
 
-    user_names.each_with_index.map do |user_name, index|
+    formatted_response = user_names.each_with_index.map do |user_name, index|
       "#{index + 1}. #{user_name}"
-    end.join(' ')
+    end.join("\n")
+
+    "```#{formatted_response}```"
   end
 end
