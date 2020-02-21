@@ -31,6 +31,7 @@ module ChannelQueues
 
         if new_membership.inactive?
           json_result[:text] = "Queue is currently closed. Queue will open at #{ChannelQueueMembership.queue_open_time.strftime('%I:%M%P %Z')}."
+          new_membership.destroy
           return json_result
         end
 

@@ -100,19 +100,11 @@ module ChannelQueues
       channel_queue = ChannelQueue.create!(slack_channel_name: 'my-channel', slack_channel_id: 'C123')
       user = User.create!(slack_user_name: 'my.user', slack_user_id: 'U123')
 
-      assert_difference 'ChannelQueueMembership.count' do
-        assert_no_difference 'ChannelQueueMembership.active.count' do
-          response = ChannelQueues::ResponseRetriever.retrieve('join', channel_queue.slack_channel_id, channel_queue.slack_channel_name, user.slack_user_id, user.slack_user_name)
-          assert_equal 'Queue is currently closed. Queue will open at 07:00am PST.', response[:text]
-          assert_equal 'ephemeral', response[:response_type]
-        end
+      assert_no_difference 'ChannelQueueMembership.count' do
+        response = ChannelQueues::ResponseRetriever.retrieve('join', channel_queue.slack_channel_id, channel_queue.slack_channel_name, user.slack_user_id, user.slack_user_name)
+        assert_equal 'Queue is currently closed. Queue will open at 07:00am PST.', response[:text]
+        assert_equal 'ephemeral', response[:response_type]
       end
-
-      channel_queue_membership = ChannelQueueMembership.last
-      assert_equal user, channel_queue_membership.user
-      assert_equal channel_queue, channel_queue_membership.channel_queue
-
-      assert_predicate channel_queue_membership, :inactive?
     end
 
     def test_retrieve__leave
