@@ -1,9 +1,9 @@
 class AddInitialStationPorts < ActiveRecord::Migration
   def up
-    EvConnectStationPort.create(qr_code: 'TBWS05', port_status: 'AVAILABLE')
-    EvConnectStationPort.create(qr_code: 'TBWS06', port_status: 'AVAILABLE')
-    EvConnectStationPort.create(qr_code: 'TBWS07', port_status: 'AVAILABLE')
-    EvConnectStationPort.create(qr_code: 'TBWS08', port_status: 'AVAILABLE')
+    EvConnectStationPort.create!(qr_code: 'TBWS05', port_status: 'AVAILABLE')
+    EvConnectStationPort.create!(qr_code: 'TBWS06', port_status: 'AVAILABLE')
+    EvConnectStationPort.create!(qr_code: 'TBWS07', port_status: 'AVAILABLE')
+    EvConnectStationPort.create!(qr_code: 'TBWS08', port_status: 'AVAILABLE')
   end
 
   def down

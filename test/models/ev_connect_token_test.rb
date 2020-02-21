@@ -3,7 +3,7 @@ require 'test_helper'
 class EvConnectTokenTest < ActiveSupport::TestCase
   setup do
     travel_to(Time.now)
-    @token = EvConnectToken.create(access_token: 'access_token', refresh_token: 'refresh_token', expires_at: Time.now + 30)
+    @token = EvConnectToken.create!(access_token: 'access_token', refresh_token: 'refresh_token', expires_at: Time.now + 30)
   end
 
   def test_validates_presence_of_access_token
@@ -57,7 +57,7 @@ class EvConnectTokenTest < ActiveSupport::TestCase
   def test_expired?
     refute @token.expired?
 
-    expired_token = EvConnectToken.create(access_token: 'access_token', refresh_token: 'refresh_token', expires_at: Time.now - 30)
+    expired_token = EvConnectToken.create!(access_token: 'access_token', refresh_token: 'refresh_token', expires_at: Time.now - 30)
     assert expired_token.expired?
   end
 end

@@ -11,7 +11,7 @@ module Evacancy
           new_status = get_status(token, station.qr_code)
           previously_open += 1 if station.port_status == 'AVAILABLE'
           currently_open += 1 if new_status == 'AVAILABLE'
-          station.update(port_status: new_status)
+          station.update!(port_status: new_status)
         end
 
         if previously_open === 0 and currently_open > 0
@@ -39,7 +39,7 @@ module Evacancy
         payload = { email: ENV['EVCONNECT_EMAIL'], password: ENV['EVCONNECT_PASSWORD'], networkId: 'ev-connect' }.to_json
         response = RestClient.post('https://api.evconnect.com/rest/v6/auth', payload, { content_type: :json })
         body = JSON.parse(response.body)
-        EvConnectToken.create(access_token: body['accessToken'], refresh_token: body['refreshToken'], expires_at: body['expiresAt'])
+        EvConnectToken.create!(access_token: body['accessToken'], refresh_token: body['refreshToken'], expires_at: body['expiresAt'])
       end
 
       def refresh_access_token(token)
@@ -47,7 +47,7 @@ module Evacancy
         response = RestClient.put('https://api.evconnect.com/rest/v6/auth', payload, { content_type: :json })
         body = JSON.parse(response.body)
         token.destroy!
-        EvConnectToken.create(access_token: body['accessToken'], refresh_token: body['refreshToken'], expires_at: body['expiresAt'])
+        EvConnectToken.create!(access_token: body['accessToken'], refresh_token: body['refreshToken'], expires_at: body['expiresAt'])
       rescue
         token.destroy!
         get_access_token
