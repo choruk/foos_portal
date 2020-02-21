@@ -1,6 +1,10 @@
 class EvConnectToken < ActiveRecord::Base
+  validates_presence_of :access_token, :refresh_token, :expires_at
+
   def access_token
-    decrypt(super)
+    value = super
+    return unless value
+    decrypt(value)
   end
 
   def access_token=(value)
@@ -8,7 +12,9 @@ class EvConnectToken < ActiveRecord::Base
   end
 
   def refresh_token
-    decrypt(super)
+    value = super
+    return unless value
+    decrypt(value)
   end
 
   def refresh_token=(value)

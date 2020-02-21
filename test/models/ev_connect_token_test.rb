@@ -6,6 +6,30 @@ class EvConnectTokenTest < ActiveSupport::TestCase
     @token = EvConnectToken.create(access_token: 'access_token', refresh_token: 'refresh_token', expires_at: Time.now + 30)
   end
 
+  def test_validates_presence_of_access_token
+    token = EvConnectToken.new(refresh_token: 'refresh_token', expires_at: Time.now)
+    assert_not_predicate token, :valid?
+
+    token.access_token = 'access_token'
+    assert_predicate token, :valid?
+  end
+
+  def test_validates_presence_of_refresh_token
+    token = EvConnectToken.new(access_token: 'access_token', expires_at: Time.now)
+    assert_not_predicate token, :valid?
+
+    token.refresh_token = 'refresh_token'
+    assert_predicate token, :valid?
+  end
+
+  def test_validates_presence_of_expires_at
+    token = EvConnectToken.new(access_token: 'access_token', refresh_token: 'refresh_token')
+    assert_not_predicate token, :valid?
+
+    token.expires_at = Time.now
+    assert_predicate token, :valid?
+  end
+
   def test_access_token_encryption
     query = <<-SQL
       SELECT t.access_token
