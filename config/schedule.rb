@@ -20,9 +20,9 @@
 # Learn more: http://github.com/javan/whenever
 
 every 1.minute do
-  runner 'Evacancy::EvConnectService.check_stations'
+  rake 'ev_connect:check_ports'
 end
 
 # every '* 8-17 * * 1-5' do
-#   rake 'ev_connect:check_stations'
+#   runner 'Evacancy::EvConnectService.check_ports'
 # end
