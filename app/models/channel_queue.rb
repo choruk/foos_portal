@@ -5,6 +5,8 @@ class ChannelQueue < ActiveRecord::Base
   validates_uniqueness_of :slack_channel_id, :slack_channel_name
 
   def members_string
+    clear_inactive_members
+
     user_names = channel_queue_memberships.order(created_at: :asc).joins(:user).pluck(:slack_user_name)
     return 'Queue is empty' if user_names.empty?
 
@@ -13,5 +15,11 @@ class ChannelQueue < ActiveRecord::Base
     end.join("\n")
 
     "```#{formatted_response}```"
+  end
+
+  private
+
+  def clear_inactive_members
+    ChannelQueueMembership.inactive.destroy_all
   end
 end
