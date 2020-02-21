@@ -1,5 +1,7 @@
 module Evacancy
   class EvConnectService
+    AVAILABLE = 'AVAILABLE'.freeze
+
     class << self
       def check_ports
         token = check_access_token
@@ -9,8 +11,8 @@ module Evacancy
 
         EvConnectStationPort.all.each do |station|
           new_status = get_status(token, station.qr_code)
-          previously_open += 1 if station.port_status == 'AVAILABLE'
-          currently_open += 1 if new_status == 'AVAILABLE'
+          previously_open += 1 if station.port_status == AVAILABLE
+          currently_open += 1 if new_status == AVAILABLE
           station.update!(port_status: new_status)
         end
 
