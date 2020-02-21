@@ -28,7 +28,7 @@ module ChannelQueues
         end
 
         ChannelQueueMembership.create!(user: user, channel_queue: channel_queue)
-        json_result[:text] = "#{user.slack_user_name} joined queue for #{channel_queue.slack_channel_name}."
+        json_result[:text] = "#{user.slack_user_name} joined queue for #{channel_queue.slack_channel_name}. Updated queue:\n#{channel_queue.reload.members_string}"
         json_result[:response_type] = 'in_channel'
       when 'leave', 'charging'
         user = find_user(user_id, user_name)
@@ -38,6 +38,8 @@ module ChannelQueues
         return json_result unless ChannelQueueMembership.where(user: user, channel_queue: channel_queue).exists?
 
         ChannelQueueMembership.where(user: user, channel_queue: channel_queue).destroy_all
+
+        json_result[:text] << " Updated queue:\n#{channel_queue.reload.members_string}"
 
         json_result[:response_type] = 'in_channel'
       when 'help'

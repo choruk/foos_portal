@@ -37,9 +37,18 @@ module MeetingRoom
     end
 
     def test_retrieve__join
+      channel_queue = ChannelQueue.create!(slack_channel_name: 'my-channel', slack_channel_id: 'C123')
+      other_user = User.create!(slack_user_name: 'other.user', slack_user_id: 'U124')
+      ChannelQueueMembership.create!(user: other_user, channel_queue: channel_queue)
+
       assert_difference 'ChannelQueueMembership.count' do
         response = ChannelQueues::ResponseRetriever.retrieve('join', 'C123', 'my-channel', 'U123', 'my.user')
-        assert_equal 'my.user joined queue for my-channel.', response[:text]
+        expected_response = <<~RESPONSE.chomp
+          my.user joined queue for my-channel. Updated queue:
+          ```1. other.user
+          2. my.user```
+        RESPONSE
+        assert_equal expected_response, response[:text]
         assert_equal 'in_channel', response[:response_type]
       end
 
@@ -85,9 +94,32 @@ module MeetingRoom
       user = User.create!(slack_user_name: 'my.user', slack_user_id: 'U123')
       ChannelQueueMembership.create!(user: user, channel_queue: channel_queue)
 
+      other_user = User.create!(slack_user_name: 'other.user', slack_user_id: 'U124')
+      ChannelQueueMembership.create!(user: other_user, channel_queue: channel_queue)
+
       assert_difference 'ChannelQueueMembership.count', -1 do
         response = ChannelQueues::ResponseRetriever.retrieve('leave', 'C123', 'my-channel', 'U123', 'my.user')
-        assert_equal 'my.user has left queue for my-channel.', response[:text]
+        expected_response = <<~RESPONSE.chomp
+          my.user has left queue for my-channel. Updated queue:
+          ```1. other.user```
+        RESPONSE
+        assert_equal expected_response, response[:text]
+        assert_equal 'in_channel', response[:response_type]
+      end
+    end
+
+    def test_retrieve__leave__empty_queue
+      channel_queue = ChannelQueue.create!(slack_channel_name: 'my-channel', slack_channel_id: 'C123')
+      user = User.create!(slack_user_name: 'my.user', slack_user_id: 'U123')
+      ChannelQueueMembership.create!(user: user, channel_queue: channel_queue)
+
+      assert_difference 'ChannelQueueMembership.count', -1 do
+        response = ChannelQueues::ResponseRetriever.retrieve('leave', 'C123', 'my-channel', 'U123', 'my.user')
+        expected_response = <<~RESPONSE.chomp
+          my.user has left queue for my-channel. Updated queue:
+          Queue is empty
+        RESPONSE
+        assert_equal expected_response, response[:text]
         assert_equal 'in_channel', response[:response_type]
       end
     end
@@ -105,9 +137,32 @@ module MeetingRoom
       user = User.create!(slack_user_name: 'my.user', slack_user_id: 'U123')
       ChannelQueueMembership.create!(user: user, channel_queue: channel_queue)
 
+      other_user = User.create!(slack_user_name: 'other.user', slack_user_id: 'U124')
+      ChannelQueueMembership.create!(user: other_user, channel_queue: channel_queue)
+
       assert_difference 'ChannelQueueMembership.count', -1 do
         response = ChannelQueues::ResponseRetriever.retrieve('charging', 'C123', 'my-channel', 'U123', 'my.user')
-        assert_equal 'my.user has left queue for my-channel.', response[:text]
+        expected_response = <<~RESPONSE.chomp
+          my.user has left queue for my-channel. Updated queue:
+          ```1. other.user```
+        RESPONSE
+        assert_equal expected_response, response[:text]
+        assert_equal 'in_channel', response[:response_type]
+      end
+    end
+
+    def test_retrieve__charging__empty_queue
+      channel_queue = ChannelQueue.create!(slack_channel_name: 'my-channel', slack_channel_id: 'C123')
+      user = User.create!(slack_user_name: 'my.user', slack_user_id: 'U123')
+      ChannelQueueMembership.create!(user: user, channel_queue: channel_queue)
+
+      assert_difference 'ChannelQueueMembership.count', -1 do
+        response = ChannelQueues::ResponseRetriever.retrieve('charging', 'C123', 'my-channel', 'U123', 'my.user')
+        expected_response = <<~RESPONSE.chomp
+          my.user has left queue for my-channel. Updated queue:
+          Queue is empty
+        RESPONSE
+        assert_equal expected_response, response[:text]
         assert_equal 'in_channel', response[:response_type]
       end
     end
