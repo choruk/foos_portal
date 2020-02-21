@@ -1,7 +1,12 @@
 require 'test_helper'
 
-module MeetingRoom
+module ChannelQueues
   class ResponseRetrieverTest < ActiveSupport::TestCase
+    setup do
+      @expiry_time = Time.now.in_time_zone('Pacific Time (US & Canada)').beginning_of_day + 7.hours
+      Time.stubs(:now).returns(@expiry_time)
+    end
+
     def test_retrieve__help
       response = ChannelQueues::ResponseRetriever.retrieve('help', 'C123', 'my-channel', 'U123', 'my.user')
       assert_equal "_/queue list_\t\tshow current queue in order from first to last\n_/queue list blast_\t\tshow current queue (to whole channel) in order from first to last\n_/queue join_\t\tjoin the queue\n_/queue leave_\t\tleave the queue\n_/queue charging_\t\tleave the queue", response[:text]
@@ -87,6 +92,19 @@ module MeetingRoom
       channel_queue_membership = ChannelQueueMembership.last
       assert_equal user, channel_queue_membership.user
       assert_equal channel_queue, channel_queue_membership.channel_queue
+    end
+
+    def test_retrieve__join__queue_closed
+      Time.stubs(:now).returns(@expiry_time - 5.minutes)
+
+      channel_queue = ChannelQueue.create!(slack_channel_name: 'my-channel', slack_channel_id: 'C123')
+      user = User.create!(slack_user_name: 'my.user', slack_user_id: 'U123')
+
+      assert_no_difference 'ChannelQueueMembership.count' do
+        response = ChannelQueues::ResponseRetriever.retrieve('join', channel_queue.slack_channel_id, channel_queue.slack_channel_name, user.slack_user_id, user.slack_user_name)
+        assert_equal 'Queue is currently closed. Queue will open at 07:00am PST.', response[:text]
+        assert_equal 'ephemeral', response[:response_type]
+      end
     end
 
     def test_retrieve__leave

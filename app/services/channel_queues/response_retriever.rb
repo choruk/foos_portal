@@ -27,7 +27,14 @@ module ChannelQueues
           return json_result
         end
 
-        ChannelQueueMembership.create!(user: user, channel_queue: channel_queue)
+        new_membership = ChannelQueueMembership.create!(user: user, channel_queue: channel_queue)
+
+        if new_membership.inactive?
+          json_result[:text] = "Queue is currently closed. Queue will open at #{ChannelQueueMembership.queue_open_time.strftime('%I:%M%P %Z')}."
+          new_membership.destroy
+          return json_result
+        end
+
         json_result[:text] = "#{user.slack_user_name} joined queue for #{channel_queue.slack_channel_name}. Updated queue:\n#{channel_queue.reload.members_string}"
         json_result[:response_type] = 'in_channel'
       when 'leave', 'charging'
