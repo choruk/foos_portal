@@ -1,5 +1,5 @@
 class ChannelQueue < ActiveRecord::Base
-  has_many :channel_queue_memberships
+  has_many :channel_queue_memberships, -> { active }
 
   validates_presence_of :slack_channel_id, :slack_channel_name
   validates_uniqueness_of :slack_channel_id, :slack_channel_name

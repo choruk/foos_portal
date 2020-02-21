@@ -50,4 +50,26 @@ class ChannelQueueMembershipTest < ActiveSupport::TestCase
 
     assert_equal user, channel_queue_membership.user
   end
+
+  def test_active__expire_after_7am
+    channel_queue = ChannelQueue.create!(slack_channel_name: 'ev-chargers-of-appfolio', slack_channel_id: 'U1234')
+
+    expiry_time = Time.now.in_time_zone('Pacific Time (US & Canada)').beginning_of_day + 7.hours
+
+    old_channel_queue_membership = ChannelQueueMembership.create!(channel_queue: channel_queue, user: User.create!(slack_user_id: '1', slack_user_name: 'joe', rank: 1500), created_at: expiry_time - 1.hour)
+    borderline_channel_queue_membership = ChannelQueueMembership.create!(channel_queue: channel_queue, user: User.create!(slack_user_id: '2', slack_user_name: 'jane', rank: 1500), created_at: expiry_time)
+    new_channel_queue_membership = ChannelQueueMembership.create!(channel_queue: channel_queue, user: User.create!(slack_user_id: '3', slack_user_name: 'eartha', rank: 1500), created_at: expiry_time + 1.hour)
+
+    assert_equal [borderline_channel_queue_membership, new_channel_queue_membership], ChannelQueueMembership.active
+  end
+
+  def test_active__expire_after_7am__empty
+    channel_queue = ChannelQueue.create!(slack_channel_name: 'ev-chargers-of-appfolio', slack_channel_id: 'U1234')
+
+    expiry_time = Time.now.in_time_zone('Pacific Time (US & Canada)').beginning_of_day + 7.hours
+
+    old_channel_queue_membership = ChannelQueueMembership.create!(channel_queue: channel_queue, user: User.create!(slack_user_id: '1', slack_user_name: 'joe', rank: 1500), created_at: expiry_time - 1.hour)
+
+    assert_empty ChannelQueueMembership.active
+  end
 end
