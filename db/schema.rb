@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200124232405) do
+ActiveRecord::Schema.define(version: 20200207213258) do
 
   create_table "channel_queue_memberships", force: true do |t|
     t.integer  "user_id",          null: false
@@ -25,6 +25,21 @@ ActiveRecord::Schema.define(version: 20200124232405) do
   create_table "channel_queues", force: true do |t|
     t.string "slack_channel_id",   null: false
     t.string "slack_channel_name", null: false
+  end
+
+  create_table "ev_connect_station_ports", force: true do |t|
+    t.string   "qr_code",     null: false
+    t.string   "port_status", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "ev_connect_tokens", force: true do |t|
+    t.string   "access_token",  null: false
+    t.string   "refresh_token", null: false
+    t.datetime "expires_at",    null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "games", force: true do |t|

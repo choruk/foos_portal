@@ -26,7 +26,8 @@ gem 'spring',        group: :development
 
 gem 'will_paginate'
 
-gem 'mocha', '1.1.0', require: false
+gem 'rest-client', '2.0.2'
+gem 'whenever', require: false
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
@@ -39,3 +40,8 @@ gem 'mocha', '1.1.0', require: false
 # Use debugger
 # gem 'debugger', group: [:development, :test]
 
+group :development, :test do
+  gem 'mocha', '1.1.0', require: false
+  gem 'pry'
+  gem 'pry-remote'
+end
