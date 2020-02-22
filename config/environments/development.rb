@@ -34,4 +34,10 @@ Rails.application.configure do
 
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
+
+  # ENV variables
+  ENV['ATTR_ENCRYPTION_KEY'] = 'DUMMY_ENCRYPTION_KEY_ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  ENV['SLACK_WEBHOOKS'] = 'hook1, hook2'
+  ENV['EV_CONNECT_EMAIL'] = 'example@email.com'
+  ENV['EV_CONNECT_PASSWORD'] = 'password'
 end
