@@ -4,7 +4,18 @@ module MeetingRoom
   class ResponseRetrieverTest < ActiveSupport::TestCase
     def test_retrieve__help
       response = ChannelQueues::ResponseRetriever.retrieve('help', 'C123', 'my-channel', 'U123', 'my.user')
-      assert_equal "_/queue list_\t\tshow current queue in order from first to last\n_/queue list blast_\t\tshow current queue (to whole channel) in order from first to last\n_/queue join_\t\tjoin the queue\n_/queue leave_\t\tleave the queue\n_/queue charging_\t\tleave the queue", response[:text]
+
+      expected_response = <<~RESPONSE.chomp
+        _/queue list_\t\tshow current queue in order from first to last
+        _/queue list blast_\t\tshow current queue (to whole channel) in order from first to last
+        _/queue join_\t\tjoin the queue
+        _/queue leave_\t\tleave the queue
+        _/queue charging_\t\tleave the queue
+        _/queue moved_\t\tnotify the next in the queue of an open spot
+        _/queue open_\t\tnotify the next in the queue of an open spot
+      RESPONSE
+
+      assert_equal expected_response, response[:text]
       assert_equal 'ephemeral', response[:response_type]
     end
 
@@ -173,6 +184,42 @@ module MeetingRoom
         assert_equal 'my.user has left queue for my-channel.', response[:text]
         assert_equal 'ephemeral', response[:response_type]
       end
+    end
+
+    def test_retrieve__moved
+      channel_queue = ChannelQueue.create!(slack_channel_name: 'my-channel', slack_channel_id: 'C123')
+      user = User.create!(slack_user_name: 'next.user', slack_user_id: 'U2')
+      ChannelQueueMembership.create!(user: user, channel_queue: channel_queue)
+
+      response = ChannelQueues::ResponseRetriever.retrieve('moved', 'C123', 'my-channel', 'U1', 'my.user')
+
+      assert_equal 'my.user has moved. <@U2> is next in line. Please dequeue when you get a spot with `/queue charging`.', response[:text]
+      assert_equal 'in_channel', response[:response_type]
+    end
+
+    def test_retrieve__moved__queue_empty
+      response = ChannelQueues::ResponseRetriever.retrieve('moved', 'C123', 'my-channel', 'U123', 'my.user')
+
+      assert_equal 'Queue is empty.', response[:text]
+      assert_equal 'ephemeral', response[:response_type]
+    end
+
+    def test_retrieve__open
+      channel_queue = ChannelQueue.create!(slack_channel_name: 'my-channel', slack_channel_id: 'C123')
+      user = User.create!(slack_user_name: 'next.user', slack_user_id: 'U2')
+      ChannelQueueMembership.create!(user: user, channel_queue: channel_queue)
+
+      response = ChannelQueues::ResponseRetriever.retrieve('open', 'C123', 'my-channel', 'U1', 'my.user')
+
+      assert_equal 'A spot is open. <@U2> is next in line. Please dequeue when you get a spot with `/queue charging`.', response[:text]
+      assert_equal 'in_channel', response[:response_type]
+    end
+
+    def test_retrieve__open__queue_empty
+      response = ChannelQueues::ResponseRetriever.retrieve('open', 'C123', 'my-channel', 'U123', 'my.user')
+
+      assert_equal 'Queue is empty.', response[:text]
+      assert_equal 'ephemeral', response[:response_type]
     end
 
     def test_retrieve__other

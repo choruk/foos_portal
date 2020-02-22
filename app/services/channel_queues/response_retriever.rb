@@ -6,6 +6,8 @@ module ChannelQueues
       'join' => 'join the queue',
       'leave' => 'leave the queue',
       'charging' => 'leave the queue',
+      'moved' => 'notify the next in the queue of an open spot',
+      'open' => 'notify the next in the queue of an open spot',
     }.freeze
 
     def self.retrieve(original_request_text, channel_id, channel_name, user_id, user_name)
@@ -41,6 +43,24 @@ module ChannelQueues
 
         json_result[:text] << " Updated queue:\n#{channel_queue.reload.members_string}"
 
+        json_result[:response_type] = 'in_channel'
+      when 'moved', 'open'
+        next_in_queue_id = NextInQueue.new(channel_queue: channel_queue).user_id
+
+        if next_in_queue_id.nil?
+          json_result[:text] = 'Queue is empty.'
+          return json_result
+        end
+
+        json_result[:text] = ''
+
+        if request == 'moved'
+          json_result[:text] << "#{find_user(user_id, user_name).slack_user_name} has moved."
+        else
+          json_result[:text] << 'A spot is open.'
+        end
+
+        json_result[:text] << " <@#{next_in_queue_id}> is next in line. Please dequeue when you get a spot with `/queue charging`."
         json_result[:response_type] = 'in_channel'
       when 'help'
         json_result[:text] = ALL_COMMANDS.map do |command, description|
