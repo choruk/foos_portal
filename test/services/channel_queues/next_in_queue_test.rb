@@ -1,6 +1,6 @@
 require 'test_helper'
 
-module MeetingRoom
+module ChannelQueues
   class NextInQueueTest < ActiveSupport::TestCase
     def test_user_name
       channel_id = 'C123'
