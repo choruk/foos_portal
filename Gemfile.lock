@@ -29,7 +29,7 @@ GEM
       tzinfo (~> 1.1)
     arel (5.0.1.20140414130214)
     builder (3.2.2)
-    chartkick (2.2.3)
+    chartkick (3.3.0)
     chronic (0.10.2)
     coderay (1.1.2)
     coffee-rails (4.0.1)
