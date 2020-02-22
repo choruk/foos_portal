@@ -9,11 +9,11 @@ module ChannelQueues
     end
 
     def user_name
-      user&.slack_user_name
+      user.try(:slack_user_name)
     end
 
     def user_id
-      user&.slack_user_id
+      user.try(:slack_user_id)
     end
 
     private
