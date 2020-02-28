@@ -19,8 +19,11 @@
 
 # Learn more: http://github.com/javan/whenever
 
+job_type :rake_with_logging, "cd :path && :environment_variable=:environment :bundle_command rake :task :output"
+set :output, 'log/cron_log.log'
+
 every 1.minute do
-  rake 'ev_connect:check_ports'
+  rake_with_logging 'check_ports'
 end
 
 # every '* 8-17 * * 1-5' do
