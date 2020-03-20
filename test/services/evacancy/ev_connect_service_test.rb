@@ -7,6 +7,8 @@ module Evacancy
       @token = EvConnectToken.create!(access_token: 'access_token', refresh_token: 'refresh_token', expires_at: Time.now + 30)
       @station1 = EvConnectStationPort.create!(qr_code: 'a1', port_status: 'AVAILABLE')
       @station2 = EvConnectStationPort.create!(qr_code: 'a2', port_status: 'AVAILABLE')
+
+      @channel_queue = ChannelQueue.create(slack_channel_id: 'CBJNVA87R', slack_channel_name: 'test')
     end
 
     def test_check_ports
@@ -25,7 +27,7 @@ module Evacancy
       assert_equal @station2.reload.port_status, 'AVAILABLE'
     end
 
-    def test_check_ports__one_spot_opens
+    def test_check_ports__one_spot_opens__someone_in_line
       @station1.update!(port_status: 'CHARGING')
       @station2.update!(port_status: 'CHARGING')
 
@@ -44,7 +46,49 @@ module Evacancy
       RestClient.expects(:get).with("https://api.evconnect.com/rest/v6/networks/ev-connect/stationPorts?qrCode=#{@station1.qr_code}", { 'EVC-API-TOKEN' => @token.access_token }).returns(available_response)
       RestClient.expects(:get).with("https://api.evconnect.com/rest/v6/networks/ev-connect/stationPorts?qrCode=#{@station2.qr_code}", { 'EVC-API-TOKEN' => @token.access_token }).returns(charging_response)
 
-      SlackWebhookService.expects(:send_message).with('A spot is available!')
+      first_user = User.create!(slack_user_id: '2', slack_user_name: 'jane', rank: 1500)
+      ChannelQueueMembership.create!(channel_queue: @channel_queue, user: first_user)
+
+      message = <<~MESSAGE
+            A spot is available!
+            <@#{first_user.slack_user_id}> is next in line!
+            Please dequeue with `/queue charging` after you plug in!
+      MESSAGE
+
+      SlackWebhookService.expects(:send_message).with(message)
+
+      Evacancy::EvConnectService.check_ports
+
+      assert_equal @station1.reload.port_status, 'AVAILABLE'
+      assert_equal @station2.reload.port_status, 'CHARGING'
+    end
+
+    def test_check_ports__one_spot_opens__no_one_in_line
+      @station1.update!(port_status: 'CHARGING')
+      @station2.update!(port_status: 'CHARGING')
+
+      available_response = mock
+      available_body = {
+        portStatus: 'AVAILABLE'
+      }.to_json
+      available_response.expects(:body).returns(available_body)
+
+      charging_response = mock
+      charging_body = {
+        portStatus: 'CHARGING'
+      }.to_json
+      charging_response.expects(:body).returns(charging_body)
+
+      RestClient.expects(:get).with("https://api.evconnect.com/rest/v6/networks/ev-connect/stationPorts?qrCode=#{@station1.qr_code}", { 'EVC-API-TOKEN' => @token.access_token }).returns(available_response)
+      RestClient.expects(:get).with("https://api.evconnect.com/rest/v6/networks/ev-connect/stationPorts?qrCode=#{@station2.qr_code}", { 'EVC-API-TOKEN' => @token.access_token }).returns(charging_response)
+
+      message = <<~MESSAGE
+            A spot is available!
+            No one is next in line!
+            Please dequeue with `/queue charging` after you plug in!
+      MESSAGE
+
+      SlackWebhookService.expects(:send_message).with(message)
 
       Evacancy::EvConnectService.check_ports
 
@@ -62,7 +106,12 @@ module Evacancy
       RestClient.expects(:get).with("https://api.evconnect.com/rest/v6/networks/ev-connect/stationPorts?qrCode=#{@station1.qr_code}", { 'EVC-API-TOKEN' => @token.access_token }).returns(response)
       RestClient.expects(:get).with("https://api.evconnect.com/rest/v6/networks/ev-connect/stationPorts?qrCode=#{@station2.qr_code}", { 'EVC-API-TOKEN' => @token.access_token }).returns(response)
 
-      SlackWebhookService.expects(:send_message).with('All spots have been taken!')
+      message = <<~MESSAGE
+            All spots have been taken!
+            Please dequeue with `/queue charging` if you just plugged in!
+      MESSAGE
+
+      SlackWebhookService.expects(:send_message).with(message)
 
       @station1.update!(port_status: 'AVAILABLE')
 

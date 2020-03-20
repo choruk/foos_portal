@@ -17,6 +17,10 @@ class ChannelQueue < ActiveRecord::Base
     "```#{formatted_response}```"
   end
 
+  def first_user_in_line
+    channel_queue_memberships.order(created_at: :asc).joins(:user).first&.user
+  end
+
   private
 
   def clear_inactive_members
