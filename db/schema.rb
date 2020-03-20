@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200221185935) do
+ActiveRecord::Schema.define(version: 20200320185718) do
 
   create_table "channel_queue_memberships", force: true do |t|
     t.integer  "user_id",          null: false
@@ -35,8 +35,8 @@ ActiveRecord::Schema.define(version: 20200221185935) do
   end
 
   create_table "ev_connect_tokens", force: true do |t|
-    t.string   "access_token",  null: false
-    t.string   "refresh_token", null: false
+    t.text     "access_token",  null: false
+    t.text     "refresh_token", null: false
     t.datetime "expires_at",    null: false
     t.datetime "created_at"
     t.datetime "updated_at"
