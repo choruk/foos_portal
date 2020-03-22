@@ -118,18 +118,4 @@ class ChannelQueueTest < ActiveSupport::TestCase
 
     assert_equal 2, ChannelQueueMembership.count
   end
-
-  def test_first_user_in_line
-    first_user_in_line = User.create!(slack_user_id: '2', slack_user_name: 'jane', rank: 1500)
-    channel_queue = ChannelQueue.create!(slack_channel_name: 'ev-chargers-of-appfolio', slack_channel_id: 'U1234')
-    ChannelQueueMembership.create!(channel_queue: channel_queue, user: User.create!(slack_user_id: '1', slack_user_name: 'joe', rank: 1500), created_at: Time.now)
-    ChannelQueueMembership.create!(channel_queue: channel_queue, user: first_user_in_line, created_at: 5.minutes.ago)
-
-    assert_equal first_user_in_line, channel_queue.first_user_in_line
-  end
-
-  def test_first_in_line__no_users_in_line
-    channel_queue = ChannelQueue.create!(slack_channel_name: 'ev-chargers-of-appfolio', slack_channel_id: 'U1234')
-    assert_equal nil, channel_queue.first_user_in_line
-  end
 end

@@ -22,13 +22,12 @@ module Evacancy
         end
 
         if previously_open === 0 and currently_open > 0
-          channel_queue = ChannelQueue.find_by(slack_channel_id: EV_CHARGERS_OF_50_CHANNEL_ID)
-          first_user = channel_queue.first_user_in_line
-          next_in_line = first_user ? "<@#{first_user.slack_user_id}>" : "No one"
+          next_in_queue_id = ChannelQueues::NextInQueue.new(channel_id: EV_CHARGERS_OF_50_CHANNEL_ID).user_id
+          next_in_queue = next_in_queue_id ? "<@#{next_in_queue_id}>" : "No one"
 
           message = <<~MESSAGE
             A spot is available!
-            #{next_in_line} is next in line!
+            #{next_in_queue} is next in line!
             Please dequeue with `/queue charging` after you plug in!
           MESSAGE
 

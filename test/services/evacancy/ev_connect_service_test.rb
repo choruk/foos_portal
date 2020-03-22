@@ -2,13 +2,15 @@ require 'test_helper'
 
 module Evacancy
   class EvConnectServiceTest < ActiveSupport::TestCase
+    EV_CHARGERS_OF_50_CHANNEL_ID = 'CBJNVA87R'.freeze
+
     setup do
       travel_to(Time.now)
       @token = EvConnectToken.create!(access_token: 'access_token', refresh_token: 'refresh_token', expires_at: Time.now + 30)
       @station1 = EvConnectStationPort.create!(qr_code: 'a1', port_status: 'AVAILABLE')
       @station2 = EvConnectStationPort.create!(qr_code: 'a2', port_status: 'AVAILABLE')
 
-      @channel_queue = ChannelQueue.create(slack_channel_id: 'CBJNVA87R', slack_channel_name: 'test')
+      @channel_queue = ChannelQueue.create(slack_channel_id: EV_CHARGERS_OF_50_CHANNEL_ID, slack_channel_name: 'test')
     end
 
     def test_check_ports
@@ -20,6 +22,9 @@ module Evacancy
 
       RestClient.expects(:get).with("https://api.evconnect.com/rest/v6/networks/ev-connect/stationPorts?qrCode=#{@station1.qr_code}", { 'EVC-API-TOKEN' => @token.access_token }).returns(response)
       RestClient.expects(:get).with("https://api.evconnect.com/rest/v6/networks/ev-connect/stationPorts?qrCode=#{@station2.qr_code}", { 'EVC-API-TOKEN' => @token.access_token }).returns(response)
+
+      ChannelQueues::NextInQueue.expects(:new).never
+      SlackWebhookService.expects(:send_message).never
 
       Evacancy::EvConnectService.check_ports
 
@@ -46,12 +51,13 @@ module Evacancy
       RestClient.expects(:get).with("https://api.evconnect.com/rest/v6/networks/ev-connect/stationPorts?qrCode=#{@station1.qr_code}", { 'EVC-API-TOKEN' => @token.access_token }).returns(available_response)
       RestClient.expects(:get).with("https://api.evconnect.com/rest/v6/networks/ev-connect/stationPorts?qrCode=#{@station2.qr_code}", { 'EVC-API-TOKEN' => @token.access_token }).returns(charging_response)
 
-      first_user = User.create!(slack_user_id: '2', slack_user_name: 'jane', rank: 1500)
-      ChannelQueueMembership.create!(channel_queue: @channel_queue, user: first_user)
+      mock_next_in_queue = mock
+      ChannelQueues::NextInQueue.expects(:new).with(channel_id: EV_CHARGERS_OF_50_CHANNEL_ID).returns(mock_next_in_queue)
+      mock_next_in_queue.expects(:user_id).returns('dummy user id')
 
       message = <<~MESSAGE
             A spot is available!
-            <@#{first_user.slack_user_id}> is next in line!
+            <@dummy user id> is next in line!
             Please dequeue with `/queue charging` after you plug in!
       MESSAGE
 
@@ -105,6 +111,8 @@ module Evacancy
 
       RestClient.expects(:get).with("https://api.evconnect.com/rest/v6/networks/ev-connect/stationPorts?qrCode=#{@station1.qr_code}", { 'EVC-API-TOKEN' => @token.access_token }).returns(response)
       RestClient.expects(:get).with("https://api.evconnect.com/rest/v6/networks/ev-connect/stationPorts?qrCode=#{@station2.qr_code}", { 'EVC-API-TOKEN' => @token.access_token }).returns(response)
+
+      ChannelQueues::NextInQueue.expects(:new).never
 
       message = <<~MESSAGE
             All spots have been taken!
