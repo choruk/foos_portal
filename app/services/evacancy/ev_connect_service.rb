@@ -1,5 +1,10 @@
 module Evacancy
   class EvConnectService
+    EV_CHARGERS_OF_50_CHANNEL_ID = 'CBJNVA87R'.freeze
+    # Currently we only have one building so the channel ID can be hard coded
+    # eventually when we have more buildings we may need a Locations model containing
+    # attributes like channel_id, webhook_url, and has_many StationPorts
+
     AVAILABLE = 'AVAILABLE'.freeze
 
     class << self
@@ -17,9 +22,23 @@ module Evacancy
         end
 
         if previously_open === 0 and currently_open > 0
-          SlackWebhookService.send_message('A spot is available!')
+          next_in_queue_id = ChannelQueues::NextInQueue.new(channel_id: EV_CHARGERS_OF_50_CHANNEL_ID).user_id
+          next_in_queue = next_in_queue_id ? "<@#{next_in_queue_id}>" : "No one"
+
+          message = <<~MESSAGE
+            A spot is available!
+            #{next_in_queue} is next in line!
+            Please dequeue with `/queue charging` after you plug in!
+          MESSAGE
+
+          SlackWebhookService.send_message(message)
         elsif previously_open > 0 and currently_open === 0
-          SlackWebhookService.send_message('All spots have been taken!')
+          message = <<~MESSAGE
+            All spots have been taken!
+            Please dequeue with `/queue charging` if you just plugged in!
+          MESSAGE
+
+          SlackWebhookService.send_message(message)
         end
       end
 
